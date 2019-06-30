@@ -269,9 +269,9 @@ if __name__ == '__main__':
     ENV_NAME = 'mppt-v0'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
-    max_action = 2.
-    min_action = -2.
-    epochs = 500
+    max_action = 0.99
+    min_action = 0.
+    epochs = 2
     epsilon = 1.0
     min_epsilon = 0.1
     EXPLORE = 200
@@ -295,8 +295,9 @@ if __name__ == '__main__':
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
-            while (not done):
+            while (not done and step<50):
                 step += 1
+                print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
                 action1 = action
                 action = np.clip(action,min_action,max_action)
@@ -320,4 +321,4 @@ if __name__ == '__main__':
             print('llegue hasta aca!!! =)')                
 
 
-        ddpg.save()
+        #ddpg.save()
