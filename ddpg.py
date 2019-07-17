@@ -318,7 +318,7 @@ if __name__ == '__main__':
                     # train with inverted gradients
                     # ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
             #print(i, step, 'last r', round(reward,3), 'episode reward',round(episode_r,3), 'epsilon', round(epsilon,3))
-            print('llegue hasta aca!!! =)')                
+        print('llegue hasta aca!!! =)')                
 
 
         #ddpg.save()
