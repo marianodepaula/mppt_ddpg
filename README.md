@@ -17,6 +17,6 @@ It is recommendable installing in a python virtual environment (https://rukbotto
 In a console run:
 
 ``` 
-pyton ddpg.py
+python ddpg.py
 
 ```
