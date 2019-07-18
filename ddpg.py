@@ -269,8 +269,8 @@ if __name__ == '__main__':
     ENV_NAME = 'mppt-v0'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
-    max_action = 0.99
-    min_action = 0.
+    max_action = 5.
+    min_action = -5.
     epochs = 2
     epsilon = 1.0
     min_epsilon = 0.1
@@ -295,7 +295,8 @@ if __name__ == '__main__':
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
-            while (not done and step<50):
+            max_steps = 50
+            while (not done and step< max_steps):
                 step += 1
                 print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
@@ -303,8 +304,7 @@ if __name__ == '__main__':
                 action = np.clip(action,min_action,max_action)
                 action = action + max(epsilon,0)*ruido.noise()
                 action = np.clip(action,min_action,max_action)
-                # print(action1, action)
-                next_state, reward, done, info = env.step(action)
+                next_state, reward, done, info = env.step(action) 
                 reward = reward + 1. 
                 # reward = np.clip(reward,-1.,1.)
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
@@ -316,9 +316,12 @@ if __name__ == '__main__':
                     # train normally
                     ddpg.train(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
                     # train with inverted gradients
-                    # ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
-            #print(i, step, 'last r', round(reward,3), 'episode reward',round(episode_r,3), 'epsilon', round(epsilon,3))
-        print('llegue hasta aca!!! =)')                
+                    ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
+                #print(i, step, 'last r', round(reward,3), 'episode reward',round(episode_r,3), 'epsilon', round(epsilon,3))
+                #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state,'last r =', round(reward[0][0],3), 'episode reward =',round(episode_r[0][0],3), 'epsilon =', round(epsilon,3))
+                print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
+                print ('--------------------------------------------')
+        print('FINNNNNN!!! =)')                
 
 
         #ddpg.save()
