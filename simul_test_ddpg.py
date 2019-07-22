@@ -94,7 +94,7 @@ class DDPG(object):
                 l2_s = tf.contrib.layers.fully_connected(l1, LAYER_2, weights_regularizer=regularizer,activation_fn=None)
                 l2 = tf.nn.leaky_relu(l2_s + l2_a)
                 v = tf.contrib.layers.fully_connected(l2, 1, weights_regularizer=regularizer, activation_fn=None)
-				
+                
             with tf.variable_scope(scope + '/actor'):
                 l1 = tf.contrib.layers.fully_connected(self.inputs, LAYER_1,  activation_fn=tf.nn.leaky_relu) # tf.nn.leaky_relu tf.nn.relu
                 l2 = tf.contrib.layers.fully_connected(l1, LAYER_2,  activation_fn=tf.nn.leaky_relu)
@@ -167,7 +167,7 @@ class DDPG(object):
             else:
                 inverting_gradients.append(dq_da * (action - self.min_action) / (self.max_action - self.min_action))
         inverting_gradients = np.array(inverting_gradients).reshape(-1, 1)
-		'''
+        '''
 
         for i in range(MINIBATCH_SIZE):
             #print('2', i,dq_das[i])
@@ -269,13 +269,13 @@ if __name__ == '__main__':
     ENV_NAME = 'mppt-v0'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
-    max_action = 5.
-    min_action = -5.
-    epochs = 2000
+    max_action = 1.
+    min_action = -1.
+    epochs = 1
     epsilon = 1.0
     min_epsilon = 0.1
     EXPLORE = 200
-    BUFFER_SIZE = 50000
+    BUFFER_SIZE = 100000
     RANDOM_SEED = 51234
     MINIBATCH_SIZE = 64# 32 # 5
     with tf.Session() as sess:
@@ -286,7 +286,7 @@ if __name__ == '__main__':
         action_dim = 1 #env.action_space.shape[0]
         ddpg = DDPG(sess, state_dim, action_dim, max_action, min_action, ACTOR_LEARNING_RATE, CRITIC_LEARNING_RATE, TAU, RANDOM_SEED,device=DEVICE)
         sess.run(tf.global_variables_initializer())
-        #ddpg.load()
+        ddpg.load()
         replay_buffer = ReplayBuffer(BUFFER_SIZE, RANDOM_SEED)
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
@@ -298,28 +298,32 @@ if __name__ == '__main__':
             episode_r = 0.
             step = 0
             max_steps = 50
-            while (not done and step< max_steps):
+            while (step< max_steps):
                 step += 1
                 print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
-                action1 = action
-                action = np.clip(action,min_action,max_action)
-                action = action + max(epsilon,0)*ruido.noise()
-                action = np.clip(action,min_action,max_action)
+                #action1 = action
+                #action = np.clip(action,min_action,max_action)
+                #action = action + max(epsilon,0)*ruido.noise()
+                #action = np.clip(action,min_action,max_action)
                 next_state, reward, done, info = env.step(action) 
                 # reward = np.clip(reward,-1.,1.)
+                '''
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
                                       done, np.reshape(next_state, (state_dim,)))
+                '''
                 state = next_state
                 episode_r = episode_r + reward
+                '''
                 if replay_buffer.size() > MINIBATCH_SIZE:
                     s_batch, a_batch, r_batch, t_batch, s2_batch = replay_buffer.sample_batch(MINIBATCH_SIZE)
                     # train normally
-                    #ddpg.train(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
+                    ddpg.train(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
                     # train with inverted gradients
-                    ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
+                    #ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
                 #print(i, step, 'last r', round(reward,3), 'episode reward',round(episode_r,3), 'epsilon', round(epsilon,3))
                 #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state,'last r =', round(reward[0][0],3), 'episode reward =',round(episode_r[0][0],3), 'epsilon =', round(epsilon,3))
+                '''
                 if done:
                     llegadas +=1
                 print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
@@ -327,4 +331,4 @@ if __name__ == '__main__':
         print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
 
 
-        ddpg.save()
+        #ddpg.save()
