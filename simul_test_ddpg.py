@@ -2,6 +2,8 @@ import tensorflow as tf
 import numpy as np
 import gym
 from ou_noise import OUNoise
+import matplotlib.pyplot as plt
+
 
 LAYER_1 = 400
 LAYER_2 = 300
@@ -255,6 +257,42 @@ class DDPG(object):
 
 
 
+class graficos(object):
+
+
+    def __init__(self,init_state,Temp_0,Irr_0):
+
+        v=init_state[0][0]
+        self.V = list([v])
+        p=init_state[0][1]
+        self.P = list([p])
+        deltav=init_state[0][2]
+        self.deltaV = list([deltav])
+        self.I = list([0.])
+        self.Temp = list([Temp_0])
+        self. Irr = list([Irr_0])
+        
+    def add(self,v,p,dv,i,T,irr):
+        self.V.append(v)
+        self.P.append(p)
+        self.deltaV.append(dv)
+        self.I.append(i)
+        self.Temp.append(T)
+        self.Irr.append(irr)
+
+
+
+    def plotear(self):
+        plt.plot(self.V,self.P)
+        plt.xlabel('V (v)')
+        plt.ylabel('P (w)')
+        plt.title('V-P curve')
+        plt.show()
+
+
+
+
+
 
 if __name__ == '__main__':
     from replay_buffer import ReplayBuffer
@@ -269,8 +307,8 @@ if __name__ == '__main__':
     ENV_NAME = 'mppt-v0'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
-    max_action = 1.
-    min_action = -1.
+    max_action = 5.
+    min_action = -5.
     epochs = 1
     epsilon = 1.0
     min_epsilon = 0.1
@@ -292,13 +330,17 @@ if __name__ == '__main__':
         llegadas =0
         for i in range(epochs):
             state = env.reset()
+            print('state_0 = ', state, state.shape)
             done = False
             epsilon -= (epsilon/EXPLORE)
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
             max_steps = 50
-            while (step< max_steps):
+            Temp_0 = 20
+            Irr_0 = 100
+            grafos = graficos(state, Temp_0, Irr_0)
+            while (step< max_steps and done == False):
                 step += 1
                 print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
@@ -306,7 +348,13 @@ if __name__ == '__main__':
                 #action = np.clip(action,min_action,max_action)
                 #action = action + max(epsilon,0)*ruido.noise()
                 #action = np.clip(action,min_action,max_action)
-                next_state, reward, done, info = env.step(action) 
+                Temp = Temp_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Temp_0
+                Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
+                next_state, reward, done, info = env.step(action,Temp,Irr)
+                #Para ir guardando datos para el ploteo final: 
+                grafos.add(next_state[0][0], next_state[0][1], next_state[0][2],info[0],info[1],info[2])
+
+
                 # reward = np.clip(reward,-1.,1.)
                 '''
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
@@ -328,6 +376,9 @@ if __name__ == '__main__':
                     llegadas +=1
                 print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
                 print ('--------------------------------------------')
+                
+            grafos.plotear()
+
         print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
 
 
