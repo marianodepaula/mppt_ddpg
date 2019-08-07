@@ -262,11 +262,11 @@ class graficos(object):
 
     def __init__(self,init_state,Temp_0,Irr_0,accion_0=0.):
 
-        v=init_state[0][0]
+        v=init_state[0]
         self.V = list([v])
-        p=init_state[0][1]
+        p=init_state[1]
         self.P = list([p])
-        deltav=init_state[0][2]
+        deltav=init_state[2]
         self.deltaV = list([deltav])
         self.I = list([0.])
         self.Temp = list([Temp_0])
@@ -377,7 +377,7 @@ if __name__ == '__main__':
                 #action = np.clip(action,min_action,max_action)
                 Temp = Temp_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Temp_0
                 Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
-                next_state, reward, done, info = env.step(action,Temp,Irr)
+                next_state, reward, done, info = env.step(action)
                 #Para ir guardando datos para el ploteo final: 
                 grafos.add(next_state[0][0], next_state[0][1], next_state[0][2],info[0],info[1],info[2],info[3])
 

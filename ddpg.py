@@ -294,6 +294,7 @@ if __name__ == '__main__':
         llegadas =0
         for i in range(epochs):
             state = env.reset()
+            print('EL ESTADO RESETEADO ES', state, state.shape)
             done = False
             epsilon -= (epsilon/EXPLORE)
             epsilon = np.maximum(min_epsilon,epsilon)
@@ -308,8 +309,10 @@ if __name__ == '__main__':
                 action = np.clip(action,min_action,max_action)
                 action = action + max(epsilon,0)*ruido.noise()
                 action = np.clip(action,min_action,max_action)
+                print('LA ACCION ES', action, action.shape) 
                 
-                next_state, reward, done, info = env.step(action) 
+                next_state, reward, done, info = env.step(action)
+                print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
                 # reward = np.clip(reward,-1.,1.)
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
                                       done, np.reshape(next_state, (state_dim,)))
