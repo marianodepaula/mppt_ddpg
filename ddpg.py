@@ -292,8 +292,6 @@ if __name__ == '__main__':
         replay_buffer = ReplayBuffer(BUFFER_SIZE, RANDOM_SEED)
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
-        irradiancias = list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
-        temperaturas = list([15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
         for i in range(epochs):
             state = env.reset()
             done = False
@@ -302,8 +300,6 @@ if __name__ == '__main__':
             episode_r = 0.
             step = 0
             max_steps = 50
-            Temp = random.sample(temperaturas,1)[0] #(Elegir un random de estos) o dejar fija la T y solo variar la irr pa empezar a probar...
-            Irr = random.sample(irradiancias, 1)[0] #random.sample(irradiancias,1) # [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0] (Elegir un random de estos)
             while (not done and step< max_steps):
                 step += 1
                 print('step =', step)
@@ -313,7 +309,7 @@ if __name__ == '__main__':
                 action = action + max(epsilon,0)*ruido.noise()
                 action = np.clip(action,min_action,max_action)
                 
-                next_state, reward, done, info = env.step(action,Temp,Irr) 
+                next_state, reward, done, info = env.step(action) 
                 # reward = np.clip(reward,-1.,1.)
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
                                       done, np.reshape(next_state, (state_dim,)))

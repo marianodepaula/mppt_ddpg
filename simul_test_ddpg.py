@@ -260,7 +260,7 @@ class DDPG(object):
 class graficos(object):
 
 
-    def __init__(self,init_state,Temp_0,Irr_0):
+    def __init__(self,init_state,Temp_0,Irr_0,accion_0=0.):
 
         v=init_state[0][0]
         self.V = list([v])
@@ -270,15 +270,17 @@ class graficos(object):
         self.deltaV = list([deltav])
         self.I = list([0.])
         self.Temp = list([Temp_0])
-        self. Irr = list([Irr_0])
+        self.Irr = list([Irr_0])
+        self.acciones = list([accion_0])
         
-    def add(self,v,p,dv,i,T,irr):
+    def add(self,v,p,dv,i,T,irr,accion):
         self.V.append(v)
         self.P.append(p)
         self.deltaV.append(dv)
         self.I.append(i)
         self.Temp.append(T)
         self.Irr.append(irr)
+        self.acciones.append(accion)
 
 
 
@@ -288,6 +290,31 @@ class graficos(object):
         plt.ylabel('P (w)')
         plt.title('V-P curve')
         plt.show()
+
+        plt.plot(self.V,self.I)
+        plt.xlabel('V (v)')
+        plt.ylabel('I (A)')
+        plt.title('V-I curve')
+        plt.show()
+
+
+        plt.plot(self.V)
+        plt.xlabel('t')
+        plt.ylabel('V (v)')
+        plt.show()
+
+        plt.plot(self.P)
+        plt.xlabel('t')
+        plt.ylabel('P (w)')
+        plt.show()
+
+        plt.plot(self.acciones)
+        plt.xlabel('t')
+        plt.ylabel('acciones (\deltaV)')
+        plt.title('actions')
+        plt.show()
+
+
 
 
 
@@ -337,10 +364,10 @@ if __name__ == '__main__':
             episode_r = 0.
             step = 0
             max_steps = 50
-            Temp_0 = 20
-            Irr_0 = 100
+            Temp_0 = 25.
+            Irr_0 = 100.
             grafos = graficos(state, Temp_0, Irr_0)
-            while (step< max_steps and done == False):
+            while (step< max_steps):
                 step += 1
                 print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
@@ -352,7 +379,7 @@ if __name__ == '__main__':
                 Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
                 next_state, reward, done, info = env.step(action,Temp,Irr)
                 #Para ir guardando datos para el ploteo final: 
-                grafos.add(next_state[0][0], next_state[0][1], next_state[0][2],info[0],info[1],info[2])
+                grafos.add(next_state[0][0], next_state[0][1], next_state[0][2],info[0],info[1],info[2],info[3])
 
 
                 # reward = np.clip(reward,-1.,1.)
