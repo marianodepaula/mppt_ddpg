@@ -289,30 +289,57 @@ class graficos(object):
         plt.xlabel('V (v)')
         plt.ylabel('P (w)')
         plt.title('V-P curve')
+        plt.savefig('VPcurve' + '.png')
         plt.show()
 
         plt.plot(self.V,self.I)
         plt.xlabel('V (v)')
         plt.ylabel('I (A)')
         plt.title('V-I curve')
+        plt.savefig('VIcurve' + '.png')
         plt.show()
 
 
         plt.plot(self.V)
         plt.xlabel('t')
         plt.ylabel('V (v)')
+        plt.savefig('Tesion' + '.png')
+        plt.show()
+
+        plt.plot(self.I)
+        plt.xlabel('t')
+        plt.ylabel('I (a)')
+        plt.savefig('Corriente' + '.png')
         plt.show()
 
         plt.plot(self.P)
         plt.xlabel('t')
         plt.ylabel('P (w)')
+        plt.savefig('Potencia' + '.png')
         plt.show()
 
         plt.plot(self.acciones)
         plt.xlabel('t')
         plt.ylabel('acciones (\deltaV)')
         plt.title('actions')
+        plt.savefig('Acciones' + '.png')
         plt.show()
+
+        plt.plot(self.Temp)
+        plt.xlabel('t')
+        plt.ylabel('(ºC)')
+        plt.title('Temperature profile')
+        plt.savefig('Temperatura' + '.png')
+        plt.show()
+
+        plt.plot(self.Irr)
+        plt.xlabel('t')
+        plt.ylabel('(Irradiance)')
+        plt.title('Solar irradiance profile')
+        plt.savefig('Irradiancia' + '.png')
+        plt.show()
+
+
 
 
 
@@ -356,16 +383,16 @@ if __name__ == '__main__':
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
         for i in range(epochs):
-            state = env.reset()
+            state = np.zeros(3) #env.reset() #Este definirlo a manopla para la simulacion, porque el reset me cambia random las T y las Irr
             print('state_0 = ', state, state.shape)
             done = False
             epsilon -= (epsilon/EXPLORE)
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
-            max_steps = 50
-            Temp_0 = 25.
-            Irr_0 = 100.
+            max_steps = 500
+            Temp_0 = 0.
+            Irr_0 = 0.
             grafos = graficos(state, Temp_0, Irr_0)
             while (step< max_steps):
                 step += 1
@@ -379,7 +406,7 @@ if __name__ == '__main__':
                 Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
                 next_state, reward, done, info = env.step(action)
                 #Para ir guardando datos para el ploteo final: 
-                grafos.add(next_state[0][0], next_state[0][1], next_state[0][2],info[0],info[1],info[2],info[3])
+                grafos.add(next_state[0], next_state[1], next_state[2],info[0],info[1],info[2],info[3])
 
 
                 # reward = np.clip(reward,-1.,1.)
