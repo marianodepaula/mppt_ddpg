@@ -20,7 +20,7 @@ env = gym.make('mppt-v0')
 env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environment to run
 
 print('training model')
-model = DDPG(MlpPolicy, env, verbose=args.verbose)
+model = PPO2(MlpPolicy, env, verbose=args.verbose)
 model.learn(total_timesteps=args.total_timesteps)
 
 print('testing the model')
