@@ -373,7 +373,7 @@ if __name__ == '__main__':
     with tf.Session() as sess:
         np.random.seed(RANDOM_SEED)
         tf.set_random_seed(RANDOM_SEED)
-        env = gym.make(ENV_NAME)
+        #env = gym.make(ENV_NAME)
         state_dim = 3 #env.observation_space.shape[0]
         action_dim = 1 #env.action_space.shape[0]
         ddpg = DDPG(sess, state_dim, action_dim, max_action, min_action, ACTOR_LEARNING_RATE, CRITIC_LEARNING_RATE, TAU, RANDOM_SEED,device=DEVICE)
@@ -384,6 +384,7 @@ if __name__ == '__main__':
         llegadas =0
         for i in range(epochs):
             state = np.zeros(3) #env.reset() #Este definirlo a manopla para la simulacion, porque el reset me cambia random las T y las Irr
+            env = gym.make(ENV_NAME)
             print('state_0 = ', state, state.shape)
             done = False
             epsilon -= (epsilon/EXPLORE)

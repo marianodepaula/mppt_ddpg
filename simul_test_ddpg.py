@@ -358,7 +358,7 @@ if __name__ == '__main__':
     TAU = 0.001
     DEVICE = '/cpu:0'
     # ENV_NAME = 'MountainCarContinuous-v0'
-    ENV_NAME = 'mppt-v0'#'Pendulum-v0'
+    ENV_NAME = 'mppt-v1'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 5.
