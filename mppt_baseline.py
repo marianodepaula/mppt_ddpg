@@ -27,6 +27,7 @@ model.learn(total_timesteps=epochs)
 
 print('testing the model')
 obs = env.reset()
+print('state =',obs,obs.shape)
 for i in range(test_epochs):
     action, _states = model.predict(obs)
     obs, rewards, dones, info = env.step(action)
