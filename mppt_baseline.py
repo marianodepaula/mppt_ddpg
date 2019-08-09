@@ -3,7 +3,7 @@ import gym_mppt
 import numpy as np
 from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.vec_env import DummyVecEnv
-from stable_baselines import PPO2
+from stable_baselines import PPO2,DDPG
 import argparse
 
 
@@ -20,7 +20,7 @@ env = gym.make('mppt-v0')
 env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environment to run
 
 print('training model')
-model = PPO2(MlpPolicy, env, verbose=args.verbose)
+model = DDPG(MlpPolicy, env, verbose=args.verbose)
 model.learn(total_timesteps=args.total_timesteps)
 
 print('testing the model')
