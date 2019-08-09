@@ -30,5 +30,6 @@ obs = env.reset()
 for i in range(test_epochs):
     action, _states = model.predict(obs)
     obs, rewards, dones, info = env.step(action)
+    print('state =',obs,'r',rewards,'done', dones, 'info',info)
     print('vamos bien, por la i=',i)
     #env.render()
