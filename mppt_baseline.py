@@ -31,4 +31,8 @@ for i in range(args.test_steps):
     obs, rewards, dones, info = env.step(action)
     print('state =',obs,'r',rewards,'done', dones, 'info',info)
     print('vamos bien, por la i=',i)
+    if i==(args.test_steps-1):
+    	print('Listo!')
+    	break
+
     #env.render()
