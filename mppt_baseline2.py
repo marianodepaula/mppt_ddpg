@@ -50,9 +50,7 @@ if __name__ == '__main__':
 	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
 	    if i==(args.test_steps-1):
-	        print('Listo!')
+	    	print('Listo!')
             break
-
-       
 
 	    #env.render()
