@@ -50,11 +50,7 @@ if __name__ == '__main__':
 	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
 	    if i==(args.test_steps-1):
-	    	x = np.linspace(0, 10, 100)
-            plt.plot(x, np.sin(x))
-            plt.plot(x, np.cos(x))
-            plt.show()
-            print('Listo!')
+	        print('Listo!')
             break
 
        
