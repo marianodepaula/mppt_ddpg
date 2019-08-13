@@ -51,6 +51,5 @@ if __name__ == '__main__':
 	    print('vamos bien, por la i=',i)
 	    if i==(args.test_steps-1):
 	    	print('Listo!')
-            break
-
+            
 	    #env.render()
