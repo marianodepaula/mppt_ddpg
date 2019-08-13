@@ -49,8 +49,11 @@ if __name__ == '__main__':
 	    obs, rewards, dones, info = env.step(action)
 	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
-	    if i==(args.test_steps-1):
-	    	print('Listo!')
-	    	break
+        if i==(args.test_steps-1):
+    	    print('Listo!')
+    	    plt.plot(rewards)
+    	    plt.show()
+            break
+       
 
 	    #env.render()
