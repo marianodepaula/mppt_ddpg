@@ -151,6 +151,8 @@ if __name__ == '__main__':
 	    	T = Temp_testing[k]
 	    	G = Irr_testing[k]
 	    	Z = str(T) + str(G)
+
+	    	Z1 = np.array([[T, G]]) 
 	    	env2.step(Z) #esto cambia la temperatura y la irradiancia en el modelo
 	    	
 
