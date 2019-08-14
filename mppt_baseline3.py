@@ -150,8 +150,8 @@ if __name__ == '__main__':
 	    	T = Temp_testing[k]
 	    	G = Irr_testing[k]
 	    	Z = str(T) + str(G)
-	    	xxxx, xxx, xx, info = env2.step(Z) #esto cambia la temperatura y la irradiancia en el modelo
-	    	print('Temperatura =',info['Temperatura'])
+	    	env2.step(Z) #esto cambia la temperatura y la irradiancia en el modelo
+	    	
 
 	    	k+=1
 
