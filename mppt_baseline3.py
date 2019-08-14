@@ -134,8 +134,8 @@ if __name__ == '__main__':
 	#grafos = graficos(obs, Temp_0, Irr_0)
     
 
-    Temp_testing = [25.00, 26.00, 27.56, 28.56, 25.00 ]
-    Irr_testing = [100.00, 100.00, 200.00, 200.00, 100.00]
+	Temp_testing = [25.00, 26.00, 27.56, 28.56, 25.00]
+	Irr_testing = [100.00, 100.00, 200.00, 200.00, 100.00]
 	k = 0
 
 	for i in range(args.test_steps):
