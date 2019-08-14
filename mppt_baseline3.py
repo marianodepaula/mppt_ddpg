@@ -132,6 +132,11 @@ if __name__ == '__main__':
 	#Irr_0 = 100
 	#env1.setTempIrr(obs,Temp_0,Irr_0)
 	#grafos = graficos(obs, Temp_0, Irr_0)
+    
+
+    Temp_testing = [25.00, 26.00, 27.56, 28.56, 25.00 ]
+    Irr_testing = [100.00, 100.00, 200.00, 200.00, 100.00]
+	k = 0
 
 	for i in range(args.test_steps):
 	    action, _states = model.predict(obs)
@@ -139,6 +144,22 @@ if __name__ == '__main__':
 	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
 	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
+
+	    if np.mod(i,5) and k<len(Temp_testing):
+
+	    	T = Temp_testing[k]
+	    	G = Irr_testing[k]
+	    	Z = str(T) + str(G)
+	    	xxxx, xxx, xx, info = env2.step(Z) #esto cambia la temperatura y la irradiancia en el modelo
+	    	print('Temperatura =',info['Temperatura'])
+
+	    	k+=1
+
+
+
+
+
+
 	    if i==(args.test_steps-1):
 	    	print('Listo!')
 	    	x = np.linspace(0,10,100)
