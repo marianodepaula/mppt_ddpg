@@ -125,9 +125,9 @@ if __name__ == '__main__':
 	model = PPO2.load('ppO2_TrainedModel')
 
 	#Testing the model:
-	env1 = gym.make('mppt-v1',25,110)
+	env1 = gym.make('mppt-v1')
 	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
-	obs = env1.reset()
+	obs = env1.reset(25.,110.)
 	Temp_0 = 25
 	Irr_0 = 100
 	#env1.setTempIrr(obs,Temp_0,Irr_0)
