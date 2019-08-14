@@ -153,7 +153,7 @@ if __name__ == '__main__':
 	    	Z = str(T) + str(G)
 
 	    	Z1 = np.array([[T, G]]) 
-	    	env2.step(Z) #esto cambia la temperatura y la irradiancia en el modelo
+	    	env2.step(Z1) #esto cambia la temperatura y la irradiancia en el modelo
 	    	
 
 	    	k+=1
