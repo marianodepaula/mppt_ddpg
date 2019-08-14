@@ -140,12 +140,13 @@ if __name__ == '__main__':
 
 	for i in range(args.test_steps):
 	    action, _states = model.predict(obs)
+	    print('accion shape= ', action.shape, type(action))
 	    next_state, rewards, dones, info = env2.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
 	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
 	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
 
-	    if np.mod(i,5) and k<len(Temp_testing):
+	    if np.mod(i,5)==0 and k<len(Temp_testing):
 
 	    	T = Temp_testing[k]
 	    	G = Irr_testing[k]
