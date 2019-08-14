@@ -7,7 +7,7 @@ from stable_baselines import PPO2,DDPG
 import argparse
 import matplotlib.pyplot as plt
 
-'''
+
 class graficos(object):
 
 
@@ -89,7 +89,7 @@ class graficos(object):
         plt.title('Solar irradiance profile')
         plt.savefig('Irradiancia' + '.png')
         plt.show()
-'''
+
 
 
 
@@ -127,12 +127,17 @@ if __name__ == '__main__':
 	#Testing the model:
 	env1 = gym.make('mppt-v1')
 	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
-	#obs = env1.reset()
+	obs = env1.reset()
+	Temp_0 = 25
+	Irr_0 = 100
+	env1.setTempIrr(obs,Temp_0,Irr_0)
+	grafos = graficos(obs, Temp_0, Irr_0)
 
 	for i in range(args.test_steps):
 	    action, _states = model.predict(obs)
-	    obs, rewards, dones, info = env1.step(action)
-	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
+	    next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
+	    grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
+	    #print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
 	    if i==(args.test_steps-1):
 	    	print('Listo!')
