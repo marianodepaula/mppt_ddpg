@@ -125,8 +125,8 @@ if __name__ == '__main__':
 	model = PPO2.load('ppO2_TrainedModel')
 
 	#Testing the model:
-	env2 = gym.make('mppt-v2')
-	env2 = DummyVecEnv([lambda: env2])  # The algorithms require a vectorized environment to run
+	env1 = gym.make('mppt-v1')
+	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
 	
 	#Temp_0 = 25
 	#Irr_0 = 100
@@ -141,11 +141,12 @@ if __name__ == '__main__':
 	for i in range(args.test_steps):
 	    action, _states = model.predict(obs)
 	    print('accion shape= ', action.shape, type(action))
-	    next_state, rewards, dones, info = env2.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
+	    next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
 	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
 	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
 
+	    '''
 	    if np.mod(i,5)==0 and k<len(Temp_testing):
 
 	    	T = Temp_testing[k]
@@ -158,7 +159,7 @@ if __name__ == '__main__':
 
 	    	k+=1
 
-
+		'''
 
 
 
