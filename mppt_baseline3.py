@@ -130,7 +130,7 @@ if __name__ == '__main__':
 	obs = env1.reset()
 	Temp_0 = 25
 	Irr_0 = 100
-	env1.setTempIrr(obs,Temp_0,Irr_0)
+	#env1.setTempIrr(obs,Temp_0,Irr_0)
 	grafos = graficos(obs, Temp_0, Irr_0)
 
 	for i in range(args.test_steps):
