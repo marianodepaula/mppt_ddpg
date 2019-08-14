@@ -7,7 +7,7 @@ from stable_baselines import PPO2,DDPG
 import argparse
 import matplotlib.pyplot as plt
 
-
+'''
 class graficos(object):
 
 
@@ -89,6 +89,7 @@ class graficos(object):
         plt.title('Solar irradiance profile')
         plt.savefig('Irradiancia' + '.png')
         plt.show()
+'''
 
 
 
@@ -126,7 +127,7 @@ if __name__ == '__main__':
 	#Testing the model:
 	env1 = gym.make('mppt-v1')
 	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
-	obs = env.reset()
+	#obs = env1.reset()
 
 	for i in range(args.test_steps):
 	    action, _states = model.predict(obs)
