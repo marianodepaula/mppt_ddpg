@@ -125,19 +125,19 @@ if __name__ == '__main__':
 	model = PPO2.load('ppO2_TrainedModel')
 
 	#Testing the model:
-	env1 = gym.make('mppt-v1')
-	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
-	obs = env1.reset(25.,110.)
-	Temp_0 = 25
-	Irr_0 = 100
+	env2 = gym.make('mppt-v2')
+	env2 = DummyVecEnv([lambda: env2])  # The algorithms require a vectorized environment to run
+	
+	#Temp_0 = 25
+	#Irr_0 = 100
 	#env1.setTempIrr(obs,Temp_0,Irr_0)
-	grafos = graficos(obs, Temp_0, Irr_0)
+	#grafos = graficos(obs, Temp_0, Irr_0)
 
 	for i in range(args.test_steps):
 	    action, _states = model.predict(obs)
-	    next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
+	    next_state, rewards, dones, info = env2.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
 	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
-	    #print('state =',obs,'r',rewards,'done', dones, 'info',info)
+	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
 	    if i==(args.test_steps-1):
 	    	print('Listo!')
