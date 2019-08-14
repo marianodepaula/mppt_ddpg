@@ -125,7 +125,7 @@ if __name__ == '__main__':
 	model = PPO2.load('ppO2_TrainedModel')
 
 	#Testing the model:
-	env1 = gym.make('mppt-v1')
+	env1 = gym.make('mppt-v1',25,110)
 	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
 	obs = env1.reset()
 	Temp_0 = 25
@@ -136,7 +136,7 @@ if __name__ == '__main__':
 	for i in range(args.test_steps):
 	    action, _states = model.predict(obs)
 	    next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
-	    grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
+	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
 	    #print('state =',obs,'r',rewards,'done', dones, 'info',info)
 	    print('vamos bien, por la i=',i)
 	    if i==(args.test_steps-1):
