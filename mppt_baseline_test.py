@@ -134,7 +134,7 @@ if __name__ == '__main__':
 		action, _states = model.predict(obs)
 		print('accion shape= ', action.shape, type(action))
 		next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
-		print('state =',next_state,'r',rewards,'done', dones, 'info',info,type(info), 'accion', info[3])
+		print('state =',next_state,'r',rewards,'done', dones, 'info',info,type(info), 'accion', info[0])
 		#grafos.add(next_state[0][0], next_state[0][1], next_state[0][2], info['Corriente'], info['Temperatura'], info['Irradiancia'], info['Accion'])
 		grafos.add(next_state[0][0], next_state[0][1], next_state[0][2], info[0], info[1], info[2], info[3])
 		print('vamos bien, por la i=',i)
