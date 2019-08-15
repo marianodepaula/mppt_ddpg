@@ -134,7 +134,7 @@ if __name__ == '__main__':
 		action, _states = model.predict(obs)
 		print('accion shape= ', action.shape, type(action))
 		next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
-	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
+		grafos.add(next_state[0], next_state[1], next_state[2], info['Corriente'], info['Temperatura'], info['Irradiancia'], info['Accion'])
 		print('state =',obs,'r',rewards,'done', dones, 'info',info)
 		print('vamos bien, por la i=',i)
 		np.save('last_state.npy',obs)
@@ -144,6 +144,7 @@ if __name__ == '__main__':
 
 
 		if i==(args.test_steps-1):
+			grafos.plotear()
 			print('Listo!')
 			break
 	    	
