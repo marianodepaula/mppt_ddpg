@@ -105,29 +105,13 @@ if __name__ == '__main__':
 
 
 
-'''	
-	#Create the environment:
-	env = gym.make('mppt-v0')
-	env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environment to run
-	print('training model')
-	# Instantiate the agent:
-	model = PPO2(MlpPolicy, env, verbose=args.verbose)
-	# Train the agent:
-	model.learn(total_timesteps=args.total_timesteps)
-	# Save the agent:
-	model.save("ppO2_TrainedModel")
-	print('Model was succesfull saved')
-
-	obs = env.reset()
-	print('state =',obs,obs.shape)
-'''
-
 	# Load the trained agent:
 	model = PPO2.load('ppO2_TrainedModel')
 
 	#Testing the model:
 	env1 = gym.make('mppt-v1')
 	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
+	obs = env1.reset()
 	
 	#Temp_0 = 25
 	#Irr_0 = 100
@@ -137,15 +121,17 @@ if __name__ == '__main__':
 
 
 	for i in range(args.test_steps):
-	    action, _states = model.predict(obs)
-	    print('accion shape= ', action.shape, type(action))
-	    next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
+
+		action, _states = model.predict(obs)
+		print('accion shape= ', action.shape, type(action))
+		next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
 	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
-	    print('state =',obs,'r',rewards,'done', dones, 'info',info)
-	    print('vamos bien, por la i=',i)
+		print('state =',obs,'r',rewards,'done', dones, 'info',info)
+		print('vamos bien, por la i=',i)
 
 
 
-	    if i==(args.test_steps-1):
-	    	print('Listo!')
+		if i==(args.test_steps-1):
+			print('Listo!')
+			break
 	    	
