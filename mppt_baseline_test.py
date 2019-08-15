@@ -124,6 +124,7 @@ if __name__ == '__main__':
 	
 	Temp_0 = 25
 	Irr_0 = 100
+	print('init_state =', obs, 'forma:',obs.shape, 'tipo', type(obs))
 	grafos = graficos(obs, Temp_0, Irr_0)
     
 
