@@ -133,13 +133,11 @@ if __name__ == '__main__':
 
 		action, _states = model.predict(obs)
 		print('accion shape= ', action.shape, type(action))
-		next_state, rewards, dones, info = env1.step(action) #info = {'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}
-		#print('state =',next_state,'r',rewards,'done', dones, 'info',info,type(info), 'accion', info[0])
-		print('info_0', info[0], type(info[0]))
-		datos = info[0]
-		print('Corriente (de datos) = ', datos['Corriente'])
-		#grafos.add(next_state[0][0], next_state[0][1], next_state[0][2], info['Corriente'], info['Temperatura'], info['Irradiancia'], info['Accion'])
-		grafos.add(next_state[0][0], next_state[0][1], next_state[0][2], info[0], info[1], info[2], info[3])
+		next_state, rewards, dones, info = env1.step(action) #info = [{'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}] es una lista con un dict adentro!! (que quilombo!!!)
+		informacion = info[0] #me quedo con el dict de info
+		grafos.add(next_state[0][0], next_state[0][1], next_state[0][2], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
+
+		
 		print('vamos bien, por la i=',i)
 		np.save('last_state.npy',obs)
     	# y si quisiera levantar tal variable x, hacemos:
