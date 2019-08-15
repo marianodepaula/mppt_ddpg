@@ -125,7 +125,7 @@ if __name__ == '__main__':
 	Temp_0 = 25
 	Irr_0 = 100
 	print('init_state =', obs, 'forma:',obs.shape, 'tipo', type(obs))
-	grafos = graficos(obs, Temp_0, Irr_0)
+	grafos = graficos(obs[0], Temp_0, Irr_0) #tomo obs[0] dado que el estado está "empaquetado" y es una matriz de 1x3, entonces me quedo con un vector pa no cambiar grafos.
     
 
 
