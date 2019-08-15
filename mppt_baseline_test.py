@@ -111,12 +111,20 @@ if __name__ == '__main__':
 	#Testing the model:
 	env1 = gym.make('mppt-v1')
 	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
-	obs = env1.reset()
+	#obs = env1.reset()
+
+	try:
+	  #f = open("demofile.txt")
+	  #f.write("Lorum Ipsum")
+	  obs = np.load('last_state.npy')
+	  print("LEVANTO EL ULTIMO ESTADO!! ")
+	except:
+	  print("Something went wrong when load the last state")
+	  obs = env1.reset()
 	
-	#Temp_0 = 25
-	#Irr_0 = 100
-	#env1.setTempIrr(obs,Temp_0,Irr_0)
-	#grafos = graficos(obs, Temp_0, Irr_0)
+	Temp_0 = 25
+	Irr_0 = 100
+	grafos = graficos(obs, Temp_0, Irr_0)
     
 
 
@@ -128,6 +136,9 @@ if __name__ == '__main__':
 	    #grafos.add(next_state[0], next_state[1], next_state[2],info['Corriente'],info['Temperatura'],info['Irradiancia'],info['Accion'])
 		print('state =',obs,'r',rewards,'done', dones, 'info',info)
 		print('vamos bien, por la i=',i)
+		np.save('last_state.npy',obs)
+    	# y si quisiera levantar tal variable x, hacemos:
+    	#variable_levantada = np.load('x.npy')
 
 
 
