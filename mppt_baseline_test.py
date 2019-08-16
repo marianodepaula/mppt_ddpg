@@ -6,9 +6,9 @@ from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2,DDPG
 import argparse
 import matplotlib.pyplot as plt
+import _pickle as cPickle
 
-
-class graficos(object):
+class DATOS(object):
 
 
     def __init__(self,init_state,Temp_0,Irr_0,accion_0=0.):
@@ -90,6 +90,9 @@ class graficos(object):
         plt.savefig('Irradiancia' + '.png')
         plt.show()
 
+   
+
+
 
 
 
@@ -101,6 +104,7 @@ if __name__ == '__main__':
 	parser.add_argument('--total_timesteps', type=int, default=2000)
 	parser.add_argument('--test_steps', type=int, default=2000)
 	parser.add_argument('--verbose', type=int, default=0)
+	parser.add_argument('--test_number', type=int)
 	args = parser.parse_args()
 
 
@@ -125,17 +129,17 @@ if __name__ == '__main__':
 	Temp_0 = 25
 	Irr_0 = 100
 	print('init_state =', obs, 'forma:',obs.shape, 'tipo', type(obs))
-	grafos = graficos(obs[0], Temp_0, Irr_0) #tomo obs[0] dado que el estado está "empaquetado" y es una matriz de 1x3, entonces me quedo con un vector pa no cambiar grafos.
+	datos = DATOS(obs[0], Temp_0, Irr_0) #tomo obs[0] dado que el estado está "empaquetado" y es una matriz de 1x3, entonces me quedo con un vector pa no cambiar grafos.
     
 
-
+	np.save('cant_pruebas.npy',args.test_number)
 	for i in range(args.test_steps):
 
 		action, _states = model.predict(obs)
 		print('accion shape= ', action.shape, type(action))
 		next_state, rewards, dones, info = env1.step(action) #info = [{'Corriente': I_new, 'Temperatura':T, 'Irradiancia':G,'Accion':action}] es una lista con un dict adentro!! (que quilombo!!!)
 		informacion = info[0] #me quedo con el dict de info
-		grafos.add(next_state[0][0], next_state[0][1], next_state[0][2], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
+		datos.add(next_state[0][0], next_state[0][1], next_state[0][2], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
 
 		
 		print('vamos bien, por la i=',i)
@@ -146,7 +150,17 @@ if __name__ == '__main__':
 
 
 		if i==(args.test_steps-1):
-			grafos.plotear()
+			np.save('last_state.npy', next_state)
+			
+			#guardo el objeto:
+			Name = 'obj'+ str(args.test_number) + '.save'
+			f = open(Name, 'wb')
+			cPickle.dump(datos, f)
+			f.close()
+			
 			print('Listo!')
 			break
-	    	
+
+
+
+    
