@@ -23,7 +23,7 @@ acciones = []
 
 for i in range(cant_objetos):
 	Name = 'obj'+ str(i) +'.save'	
-	
+	print('i =', i, 'Name=',Name)
 	#Levantar un objeto guardado:
 	f = open(Name, 'rb')
 	loaded_data = cPickle.load(f)
