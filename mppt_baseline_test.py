@@ -104,7 +104,7 @@ if __name__ == '__main__':
 	parser.add_argument('--total_timesteps', type=int, default=2000)
 	parser.add_argument('--test_steps', type=int, default=2000)
 	parser.add_argument('--test_number', type=int)
-    parser.add_argument('--verbose', type=int, default=0)
+    #parser.add_argument('--verbose', type=int, default=0)
 	args = parser.parse_args()
 
 
