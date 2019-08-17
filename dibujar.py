@@ -2,12 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import _pickle as cPickle
 
+
 #Levantar un objeto guardado:
+'''
 f = open('obj.save', 'rb')
 loaded_obj = cPickle.load(f)
 print('altura del gato restored', loaded_obj.altura)
 f.close()
-
+'''
 
 cant_objetos = np.load('cant_pruebas.npy') #ojo aca de no levantar pruebas viejas dado que esto se va guardando a mano, en funcion del numero de test...sino ponerlo a manopla
 
