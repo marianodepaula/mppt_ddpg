@@ -32,7 +32,7 @@ for i in range(cant_objetos):
 	if i == 0:
 		first_index = 0
 	else:
-		first_index =i
+		first_index =1
 
 	tension = loaded_data.V[first_index:] + tension
 	potencia = loaded_data.P[first_index:] + potencia
