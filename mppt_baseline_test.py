@@ -6,7 +6,7 @@ from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2,DDPG
 import argparse
 import matplotlib.pyplot as plt
-import _pickle as cPickle
+import pickle
 
 class DATOS(object):
 
@@ -154,9 +154,13 @@ if __name__ == '__main__':
 			
 			#guardo el objeto:
 			Name = 'obj'+ str(args.test_number) + '.save'
-			f = open(Name, 'wb')
-			cPickle.dump(datos, f)
-			f.close()
+			#f = open(Name, 'wb')
+			#cPickle.dump(datos, f)
+			#f.close()
+
+
+            with open('obj0.save', 'wb') as data_file:
+                pickle.dump(datos, data_file)
 			
 			print('Listo!')
 			break
