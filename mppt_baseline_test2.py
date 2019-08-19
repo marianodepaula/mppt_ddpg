@@ -161,7 +161,7 @@ if __name__ == '__main__':
 			#cPickle.dump(datos, f)
 			#f.close()
 
-			with open('obj0.save', 'wb') as data_file:
+			with open(Name, 'wb') as data_file:
 				pickle.dump(datos, data_file)
 			
 			print('Listo!')
