@@ -11,7 +11,7 @@ print('altura del gato restored', loaded_obj.altura)
 f.close()
 '''
 
-cant_objetos = 1 # np.load('cant_pruebas.npy') #ojo aca de no levantar pruebas viejas dado que esto se va guardando a mano, en funcion del numero de test...sino ponerlo a manopla
+cant_objetos = np.load('cant_pruebas.npy') #ojo aca de no levantar pruebas viejas dado que esto se va guardando a mano, en funcion del numero de test...sino ponerlo a manopla
 
 tension = []
 potencia =[]
@@ -20,8 +20,8 @@ corriente = []
 temperatura = []
 irradiancia = []
 acciones = []
-i=0.
-while i<=1:
+i=0
+while i<=cant_objetos:
 	#print('entramos al while')
 	#Name = 'obj'+ str(i) +'.save'	
 	#print('i =', i, 'Name=',Name)
@@ -32,9 +32,9 @@ while i<=1:
 	#loaded_data = cPickle.load(f)
 	#f.close()
 
-	Name = 'obj'+str(i)+'.save'
+	Name = 'obj'+ str(i)+ '.save'
 	print('Name es:', Name)
-	with open('obj0.save', 'rb') as data_file:
+	with open(Name, 'rb') as data_file:
 		loaded_data = pickle.load(data_file)
 
 	if i == 0:
