@@ -1,7 +1,8 @@
 import gym
 import gym_mppt
 import numpy as np
-from stable_baselines.common.policies import MlpPolicy
+#from stable_baselines.common.policies import MlpPolicy
+from stable_baselines.ddpg.policies import MlpPolicy #For DDPG un comment this line and comment the previous one
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2,DDPG,TRPO,A2C
 from stable_baselines.ddpg.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise, AdaptiveParamNoiseSpec
@@ -112,7 +113,7 @@ if __name__ == '__main__':
 	env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environment to run
 	print('training model')
 	
-	# The noise objects for DDPG (uncomment the following 3 lines for DDPG)
+	# The noise objects for DDPG (uncomment the following 3 lines for DDPG) (https://stable-baselines.readthedocs.io/en/master/modules/ddpg.html)
 	n_actions = env.action_space.shape[-1]
 	param_noise = None
 	action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=float(0.5) * np.ones(n_actions))
