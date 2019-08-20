@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
 	# Load the trained agent:
 	#model = PPO2.load('ppO2_TrainedModel') 
-	model = PPO2.load('ddpg_TrainedModel') 
+	model = DDPG.load('ddpg_TrainedModel') #uncomment this line for ddpg test
 
 	#Testing the model:
 	env1 = gym.make('mppt-v1')
