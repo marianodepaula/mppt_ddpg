@@ -2,7 +2,7 @@ import gym
 import gym_mppt
 import numpy as np
 #from stable_baselines.common.policies import MlpPolicy
-from stable_baselines.ddpg.policies import MlpPolicy #For DDPG un comment this line and comment the previous one
+from stable_baselines.ddpg.policies import MlpPolicy #For DDPG uncomment this line and comment the previous one
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2,DDPG,TRPO,A2C
 from stable_baselines.ddpg.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise, AdaptiveParamNoiseSpec
@@ -120,8 +120,9 @@ if __name__ == '__main__':
 
 
 	# Instantiate the agent:
-	#model = PPO2(MlpPolicy, env, verbose=args.verbose)
-	model = DDPG(MlpPolicy, env, verbose=args.verbose, param_noise=param_noise, action_noise=action_noise)
+	#model = PPO2(MlpPolicy, env, verbose=args.verbose) #ojo que usa el MlpPolicy del common policies (uncomment line 4 and comment line 5)
+	model = DDPG(MlpPolicy, env, verbose=args.verbose, param_noise=param_noise, action_noise=action_noise) #ojo que usa el MlpPolicy del ddpg policies (comment line 4 and uncomment line 5)
+	#model = TRPO(MlpPolicy, env, verbose=1) #ojo que usa el MlpPolicy del common policies (uncomment line 4 and comment line 5)
 
 
 	# Train the agent:
@@ -131,6 +132,7 @@ if __name__ == '__main__':
 	# Save the agent:
 	#model.save("ppO2_TrainedModel")
 	model.save("ddpg_TrainedModel")
+	#model.save("trpo_TrainedModel")
 	print('Model was succesfull saved')
 
 	obs = env.reset()

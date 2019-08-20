@@ -1,7 +1,8 @@
 import gym
 import gym_mppt
 import numpy as np
-from stable_baselines.common.policies import MlpPolicy
+#from stable_baselines.common.policies import MlpPolicy
+from stable_baselines.ddpg.policies import MlpPolicy #For DDPG uncomment this line and comment the previous one
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2,DDPG
 import argparse
@@ -113,8 +114,9 @@ if __name__ == '__main__':
 
 
 	# Load the trained agent:
-	#model = PPO2.load('ppO2_TrainedModel') 
+	#model = PPO2.load('ppO2_TrainedModel') #uncomment this line for ppo2 test
 	model = DDPG.load('ddpg_TrainedModel') #uncomment this line for ddpg test
+	#model = TRPO.load('trpo_TrainedModel') #uncomment this line for trpo test
 
 	#Testing the model:
 	env1 = gym.make('mppt-v1')
