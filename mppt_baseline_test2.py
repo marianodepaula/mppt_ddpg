@@ -145,7 +145,7 @@ if __name__ == '__main__':
 		datos.add(next_state[0][0], next_state[0][1], next_state[0][2], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
 
 		
-		print('vamos bien, por la i=',i)
+		print('vamos bien, por la i=',i,'la corriente es:',informacion['Corriente'])
 		np.save('last_state.npy',obs)
 		# y si quisiera levantar tal variable x, hacemos:
 		#variable_levantada = np.load('x.npy')
