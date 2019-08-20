@@ -3,7 +3,7 @@ import gym_mppt
 import numpy as np
 #from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.ddpg.policies import MlpPolicy #For DDPG uncomment this line and comment the previous one
-from stable_baselines.common.vec_env import DummyVecEnv
+from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 from stable_baselines import PPO2,DDPG,TRPO,A2C
 from stable_baselines.ddpg.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise, AdaptiveParamNoiseSpec
 import argparse
@@ -118,11 +118,16 @@ if __name__ == '__main__':
 	param_noise = None
 	action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=float(0.5) * np.ones(n_actions))
 
+	# multiprocess environment (Esto es para el A2C)
+	#n_cpu = 4
+	#env = SubprocVecEnv([lambda: gym.make('mppt-v0') for i in range(n_cpu)]) #(Cuando se use A2C uncomment esta linea y comment la 112)
+
 
 	# Instantiate the agent:
 	#model = PPO2(MlpPolicy, env, verbose=args.verbose) #ojo que usa el MlpPolicy del common policies (uncomment line 4 and comment line 5)
 	model = DDPG(MlpPolicy, env, verbose=args.verbose, param_noise=param_noise, action_noise=action_noise) #ojo que usa el MlpPolicy del ddpg policies (comment line 4 and uncomment line 5)
 	#model = TRPO(MlpPolicy, env, verbose=1) #ojo que usa el MlpPolicy del common policies (uncomment line 4 and comment line 5)
+	#model = A2C(MlpPolicy, env, verbose=1)
 
 
 	# Train the agent:
@@ -133,6 +138,7 @@ if __name__ == '__main__':
 	#model.save("ppO2_TrainedModel")
 	model.save("ddpg_TrainedModel")
 	#model.save("trpo_TrainedModel")
+	#model.save("a2c_TrainedModel")
 	print('Model was succesfull saved')
 
 	obs = env.reset()

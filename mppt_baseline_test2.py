@@ -3,8 +3,8 @@ import gym_mppt
 import numpy as np
 #from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.ddpg.policies import MlpPolicy #For DDPG uncomment this line and comment the previous one
-from stable_baselines.common.vec_env import DummyVecEnv
-from stable_baselines import PPO2,DDPG
+from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
+from stable_baselines import PPO2,DDPG,TRPO,A2C
 import argparse
 import matplotlib.pyplot as plt
 import pickle
@@ -117,10 +117,19 @@ if __name__ == '__main__':
 	#model = PPO2.load('ppO2_TrainedModel') #uncomment this line for ppo2 test
 	model = DDPG.load('ddpg_TrainedModel') #uncomment this line for ddpg test
 	#model = TRPO.load('trpo_TrainedModel') #uncomment this line for trpo test
+	#model = A2C.load('trpo_TrainedModel') #uncomment this line for trpo test
 
 	#Testing the model:
 	env1 = gym.make('mppt-v1')
 	env1 = DummyVecEnv([lambda: env1])  # The algorithms require a vectorized environment to run
+	
+	#Only to test A2C
+	# multiprocess environment
+	#n_cpu = 4
+	#env1 = SubprocVecEnv([lambda: gym.make('mppt-v1') for i in range(n_cpu)])
+
+
+
 	#obs = env1.reset()
 
 	try:
