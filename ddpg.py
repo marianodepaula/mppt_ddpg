@@ -101,10 +101,10 @@ class DDPG(object):
                 l1 = tf.contrib.layers.fully_connected(self.inputs, LAYER_1,  activation_fn=tf.nn.leaky_relu) # tf.nn.leaky_relu tf.nn.relu
                 l2 = tf.contrib.layers.fully_connected(l1, LAYER_2,  activation_fn=tf.nn.leaky_relu)
                 w_init = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
-                #a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=tf.nn.tanh) # (para el ddpg)
-                a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=None) # (para el inverted)
-                #scaled_a = tf.multiply(a,self.max_action) #(para el ddpg)
-                scaled_a = a # (para el inverted)
+                a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=tf.nn.tanh) # (para el ddpg)
+                #a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=None) # (para el inverted)
+                scaled_a = tf.multiply(a,self.max_action) #(para el ddpg)
+                #scaled_a = a # (para el inverted)
                 
                        
         saver = tf.train.Saver()
@@ -302,34 +302,37 @@ if __name__ == '__main__':
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
-            max_steps = 50
-            while (not done and step< max_steps):
+            max_steps = 110
+            while (not done):
                 step += 1
                 print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
                 action1 = action
-                action = np.clip(action,min_action,max_action)
+                print('LA ACCION sin clipear ES', action1, action1.shape) 
+                action = np.clip(action1,min_action,max_action)
                 action = action + max(epsilon,0)*ruido.noise()
                 action = np.clip(action,min_action,max_action)
-                #print('LA ACCION ES', action, action.shape) 
+                print('LA ACCION clipeada ES', action, action.shape) 
                 
                 next_state, reward, done, info = env.step(action)
                 #print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
-                # reward = np.clip(reward,-1.,1.)
+                #reward = np.clip(reward,-1.,1.)
+                print('instaneous r = ',reward)
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
                                       done, np.reshape(next_state, (state_dim,)))
                 state = next_state
                 episode_r = episode_r + reward
                 if replay_buffer.size() > MINIBATCH_SIZE:
                     s_batch, a_batch, r_batch, t_batch, s2_batch = replay_buffer.sample_batch(MINIBATCH_SIZE)
-                    # train ddpg ormally:
-                    #ddpg.train(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
-                    # train with inverted gradients
-                    ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
+                    # train ddpg normally:
+                    ddpg.train(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
+                    #train with inverted gradients
+                    #ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
                 #print(i, step, 'last r', round(reward,3), 'episode reward',round(episode_r,3), 'epsilon', round(epsilon,3))
                 #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state,'last r =', round(reward[0][0],3), 'episode reward =',round(episode_r[0][0],3), 'epsilon =', round(epsilon,3))
                 if done:
                     llegadas +=1
+                print ('--------------------------------------------')
                 print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
                 print ('--------------------------------------------')
         print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
