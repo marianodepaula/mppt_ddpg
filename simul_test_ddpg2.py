@@ -358,7 +358,7 @@ if __name__ == '__main__':
     TAU = 0.001
     DEVICE = '/cpu:0'
     # ENV_NAME = 'MountainCarContinuous-v0'
-    ENV_NAME = 'mppt-v0'#'Pendulum-v0'
+    ENV_NAME = 'mppt-v1'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 5.
@@ -399,15 +399,18 @@ if __name__ == '__main__':
                 step += 1
                 print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
+                #print('la accion es:', action, type(action))
                 #action1 = action
-                #action = np.clip(action,min_action,max_action)
+                action = np.clip(action,min_action,max_action)
                 #action = action + max(epsilon,0)*ruido.noise()
                 #action = np.clip(action,min_action,max_action)
                 Temp = Temp_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Temp_0
                 Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
                 next_state, reward, done, info = env.step(action)
                 #Para ir guardando datos para el ploteo final: 
-                grafos.add(next_state[0], next_state[1], next_state[2],info[0],info[1],info[2],info[3])
+                informacion = info #me quedo con el dict de info
+                grafos.add(next_state[0], next_state[1], next_state[2], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
+                #grafos.add(next_state[0], next_state[1], next_state[2],info[0],info[1],info[2],info[3])
 
 
                 # reward = np.clip(reward,-1.,1.)

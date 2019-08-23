@@ -20,3 +20,11 @@ In a console run:
 python ddpg.py
 
 ```
+
+### Testing:
+
+``` 
+python simul_test_ddpg2.py
+
+
+
