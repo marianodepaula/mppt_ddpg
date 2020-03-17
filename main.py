@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import gym
 from ou_noise import OUNoise
-import matplotlib.pyplot as plt
+import random
 
 
 LAYER_1 = 400
@@ -96,14 +96,16 @@ class DDPG(object):
                 l2_s = tf.contrib.layers.fully_connected(l1, LAYER_2, weights_regularizer=regularizer,activation_fn=None)
                 l2 = tf.nn.leaky_relu(l2_s + l2_a)
                 v = tf.contrib.layers.fully_connected(l2, 1, weights_regularizer=regularizer, activation_fn=None)
-                
+				
             with tf.variable_scope(scope + '/actor'):
                 l1 = tf.contrib.layers.fully_connected(self.inputs, LAYER_1,  activation_fn=tf.nn.leaky_relu) # tf.nn.leaky_relu tf.nn.relu
                 l2 = tf.contrib.layers.fully_connected(l1, LAYER_2,  activation_fn=tf.nn.leaky_relu)
                 w_init = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
-                a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=None) # None  tf.nn.tanh
-                scaled_a = a
-                # scaled_a = tf.clip_by_value(a,self.min_action,self.max_action)#tf.multiply(a, self.action_bound)
+                a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=tf.nn.tanh) # (para el ddpg)
+                #a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=None) # (para el inverted)
+                scaled_a = tf.multiply(a,self.max_action) #(para el ddpg)
+                #scaled_a = a # (para el inverted)
+                
                        
         saver = tf.train.Saver()
         return v, a, scaled_a, saver
@@ -169,7 +171,7 @@ class DDPG(object):
             else:
                 inverting_gradients.append(dq_da * (action - self.min_action) / (self.max_action - self.min_action))
         inverting_gradients = np.array(inverting_gradients).reshape(-1, 1)
-        '''
+		'''
 
         for i in range(MINIBATCH_SIZE):
             #print('2', i,dq_das[i])
@@ -257,97 +259,6 @@ class DDPG(object):
 
 
 
-class graficos(object):
-
-
-    def __init__(self,init_state,Temp_0,Irr_0,accion_0=0.):
-
-        v=init_state[0]
-        self.V = list([v])
-        p=init_state[1]
-        self.P = list([p])
-        #deltav=init_state[2]
-        #self.deltaV = list([deltav])
-        self.I = list([0.])
-        self.Temp = list([Temp_0])
-        self.Irr = list([Irr_0])
-        self.acciones = list([accion_0])
-        
-    def add(self,v,p,i,T,irr,accion):
-        #add(self,v,p,dv,i,T,irr,accion):
-        self.V.append(v)
-        self.P.append(p)
-        #self.deltaV.append(dv)
-        self.I.append(i)
-        self.Temp.append(T)
-        self.Irr.append(irr)
-        self.acciones.append(accion)
-
-
-
-    def plotear(self):
-        plt.plot(self.V,self.P)
-        plt.xlabel('V (v)')
-        plt.ylabel('P (w)')
-        plt.title('V-P curve')
-        plt.savefig('VPcurve' + '.png')
-        plt.show()
-
-        plt.plot(self.V,self.I)
-        plt.xlabel('V (v)')
-        plt.ylabel('I (A)')
-        plt.title('V-I curve')
-        plt.savefig('VIcurve' + '.png')
-        plt.show()
-
-
-        plt.plot(self.V)
-        plt.xlabel('t')
-        plt.ylabel('V (v)')
-        plt.savefig('Tesion' + '.png')
-        plt.show()
-
-        plt.plot(self.I)
-        plt.xlabel('t')
-        plt.ylabel('I (a)')
-        plt.savefig('Corriente' + '.png')
-        plt.show()
-
-        plt.plot(self.P)
-        plt.xlabel('t')
-        plt.ylabel('P (w)')
-        plt.savefig('Potencia' + '.png')
-        plt.show()
-
-        plt.plot(self.acciones)
-        plt.xlabel('t')
-        plt.ylabel('acciones (\deltaV)')
-        plt.title('actions')
-        plt.savefig('Acciones' + '.png')
-        plt.show()
-
-        plt.plot(self.Temp)
-        plt.xlabel('t')
-        plt.ylabel('(ºC)')
-        plt.title('Temperature profile')
-        plt.savefig('Temperatura' + '.png')
-        plt.show()
-
-        plt.plot(self.Irr)
-        plt.xlabel('t')
-        plt.ylabel('(Irradiance)')
-        plt.title('Solar irradiance profile')
-        plt.savefig('Irradiancia' + '.png')
-        plt.show()
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     from replay_buffer import ReplayBuffer
@@ -364,87 +275,78 @@ if __name__ == '__main__':
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 5.
     min_action = -5.
-    epochs = 1
+    epochs = 2000
     epsilon = 1.0
     min_epsilon = 0.1
-    EXPLORE = 200
-    BUFFER_SIZE = 100000
+    EXPLORE = 2000
+    BUFFER_SIZE = 50000
     RANDOM_SEED = 51234
     MINIBATCH_SIZE = 64# 32 # 5
     with tf.Session() as sess:
         np.random.seed(RANDOM_SEED)
         tf.set_random_seed(RANDOM_SEED)
-        #env = gym.make(ENV_NAME)
-        state_dim = 2 #env.observation_space.shape[0]
+        env = gym.make(ENV_NAME)
+        state_dim = np.size(env.reset()) #env.observation_space.shape[0]
         action_dim = 1 #env.action_space.shape[0]
         ddpg = DDPG(sess, state_dim, action_dim, max_action, min_action, ACTOR_LEARNING_RATE, CRITIC_LEARNING_RATE, TAU, RANDOM_SEED,device=DEVICE)
         sess.run(tf.global_variables_initializer())
-        ddpg.load()
+        #ddpg.load()
         replay_buffer = ReplayBuffer(BUFFER_SIZE, RANDOM_SEED)
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
+        Reward_episodios = []
         for i in range(epochs):
-            state = np.zeros(state_dim) #env.reset() #Este definirlo a manopla para la simulacion, porque el reset me cambia random las T y las Irr
-            env = gym.make(ENV_NAME)
-            print('state_0 = ', state, state.shape)
+            state = env.reset()
+            #print('EL ESTADO RESETEADO ES', state, state.shape)
             done = False
             epsilon -= (epsilon/EXPLORE)
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
-            max_steps = 200
-            Temp_0 = 0.
-            Irr_0 = 0.
-            grafos = graficos(state, Temp_0, Irr_0)
-            while (step< max_steps):
+            max_steps = 110
+            r_episodio_actual = []
+            while (not done):
                 step += 1
                 print('step =', step)
+                wait = input("PRESS ENTER TO CONTINUE.")
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
-                #print('la accion es:', action, type(action))
-                #action1 = action
-                #action = np.clip(action,min_action,max_action)
-                #action = action + max(epsilon,0)*ruido.noise()
-                #action = np.clip(action,min_action,max_action)
-                Temp = Temp_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Temp_0
-                Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
+                action1 = action
+                print('LA ACCION sin clipear ES', action1, action1.shape) 
+                action = np.clip(action1,min_action,max_action)
+                action = action + max(epsilon,0)*ruido.noise()*2.
+                action = np.clip(action,min_action,max_action)
+                print('ruido =', max(epsilon,0)*ruido.noise()*2.,'epsilon =',epsilon)
+                print('LA ACCION clipeada ES', action, action.shape)
+                
                 next_state, reward, done, info = env.step(action)
-                #Para ir guardando datos para el ploteo final: 
-                informacion = info #me quedo con el dict de info
-                
-                #Depende como este configurado el estado, son los datos que guardamos de next_state:
-                
-                #      Cuadno considerando 3 componentes del estado (V,P,dV):
-                #grafos.add(next_state[0], next_state[1], next_state[2], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
-                
-                #      Cuadno considerando 2 componentes del estado (V,P):
-                grafos.add(next_state[0], next_state[1], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
-
-
-                # reward = np.clip(reward,-1.,1.)
-                '''
+                print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
+                #reward = np.clip(reward,-1.,1.)
+                print('instaneous r = ',reward)
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
                                       done, np.reshape(next_state, (state_dim,)))
-                '''
                 state = next_state
                 episode_r = episode_r + reward
-                '''
+
+                r_episodio_actual.append(reward)
                 if replay_buffer.size() > MINIBATCH_SIZE:
                     s_batch, a_batch, r_batch, t_batch, s2_batch = replay_buffer.sample_batch(MINIBATCH_SIZE)
-                    # train normally
+                    # train ddpg normally:
                     ddpg.train(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
-                    # train with inverted gradients
+                    #train with inverted gradients
                     #ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
                 #print(i, step, 'last r', round(reward,3), 'episode reward',round(episode_r,3), 'epsilon', round(epsilon,3))
                 #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state,'last r =', round(reward[0][0],3), 'episode reward =',round(episode_r[0][0],3), 'epsilon =', round(epsilon,3))
-                '''
                 if done:
                     llegadas +=1
+                print ('--------------------------------------------')
                 print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
                 print ('--------------------------------------------')
-                
-            grafos.plotear()
+
+            Reward_episodios.append(r_episodio_actual)
+            np.save('Reward_episodios_DDPG01.npy',Reward_episodios)
+            
 
         print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
 
 
-        #ddpg.save()
+        ddpg.save()

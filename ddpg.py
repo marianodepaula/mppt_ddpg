@@ -275,10 +275,10 @@ if __name__ == '__main__':
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 5.
     min_action = -5.
-    epochs = 1000
+    epochs = 2000
     epsilon = 1.0
     min_epsilon = 0.1
-    EXPLORE = 200
+    EXPLORE = 2000
     BUFFER_SIZE = 50000
     RANDOM_SEED = 51234
     MINIBATCH_SIZE = 64# 32 # 5
@@ -286,7 +286,7 @@ if __name__ == '__main__':
         np.random.seed(RANDOM_SEED)
         tf.set_random_seed(RANDOM_SEED)
         env = gym.make(ENV_NAME)
-        state_dim = 2 #env.observation_space.shape[0]
+        state_dim = np.size(env.reset()) #env.observation_space.shape[0]
         action_dim = 1 #env.action_space.shape[0]
         ddpg = DDPG(sess, state_dim, action_dim, max_action, min_action, ACTOR_LEARNING_RATE, CRITIC_LEARNING_RATE, TAU, RANDOM_SEED,device=DEVICE)
         sess.run(tf.global_variables_initializer())
@@ -308,14 +308,15 @@ if __name__ == '__main__':
             while (not done):
                 step += 1
                 print('step =', step)
-                #wait = input("PRESS ENTER TO CONTINUE.")
+                wait = input("PRESS ENTER TO CONTINUE.")
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
                 action1 = action
                 print('LA ACCION sin clipear ES', action1, action1.shape) 
                 action = np.clip(action1,min_action,max_action)
-                #action = action + max(epsilon,0)*ruido.noise()
+                action = action + max(epsilon,0)*ruido.noise()*2.
                 action = np.clip(action,min_action,max_action)
-                print('LA ACCION clipeada ES', action, action.shape) 
+                print('ruido =', max(epsilon,0)*ruido.noise()*2.,'epsilon =',epsilon)
+                print('LA ACCION clipeada ES', action, action.shape)
                 
                 next_state, reward, done, info = env.step(action)
                 print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
