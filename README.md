@@ -2,18 +2,25 @@
 
 ## Requirements: 
 
-- tensorflow
+- tensorflow 1
 - numpy
 - python 3.5
 - Gym Open AI
 - Gym environment 'mppt-v0'
 
-### Source: mppt-v0
-Clone the mmppt-v0 gym environment from https://github.com/loavila/mppt-gym and install following the instructions.
+### Source: mppt-gym
+Clone the environment mmppt-gym from https://github.com/loavila/mppt-gym and install following the instructions.
 
 It is recommendable installing in a python virtual environment (https://rukbottoland.com/blog/tutorial-de-python-virtualenv/)
 
-## How to run:
+#### Environment descriptions
+
+- mmpt-v0 is a standard environment of a photovoltaic system (put link to the model)
+
+- mmpt_shaded-v0 is an environment of a photovoltaic system with partial shading (put link to the model)
+
+
+## How to run the training:
 In a console run:
 
 ``` 

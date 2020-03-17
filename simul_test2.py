@@ -302,40 +302,41 @@ class graficos(object):
 
 
         plt.plot(self.V)
-        plt.xlabel('t')
-        plt.ylabel('V (v)')
+        plt.xlabel('Time (sec)')
+        plt.ylabel('V (volts)')
         plt.savefig('Tesion' + '.png')
         plt.show()
 
         plt.plot(self.I)
-        plt.xlabel('t')
-        plt.ylabel('I (a)')
+        plt.xlabel('Time (sec)')
+        plt.ylabel('I (amperes)')
         plt.savefig('Corriente' + '.png')
         plt.show()
 
         plt.plot(self.P)
-        plt.xlabel('t')
-        plt.ylabel('P (w)')
+        plt.xlabel('Time (sec)')
+        plt.ylabel(' Power (Watts)')
+        #plt.title('Power')
         plt.savefig('Potencia' + '.png')
         plt.show()
 
         plt.plot(self.acciones)
-        plt.xlabel('t')
-        plt.ylabel('acciones (\deltaV)')
-        plt.title('actions')
+        plt.xlabel('Time (sec)')
+        plt.ylabel('')
+        plt.title('Manipulated actions')
         plt.savefig('Acciones' + '.png')
         plt.show()
 
         plt.plot(self.Temp)
-        plt.xlabel('t')
+        plt.xlabel('Time')
         plt.ylabel('(ºC)')
         plt.title('Temperature profile')
         plt.savefig('Temperatura' + '.png')
         plt.show()
 
         plt.plot(self.Irr)
-        plt.xlabel('t')
-        plt.ylabel('(Irradiance)')
+        plt.xlabel('Time (sec)')
+        plt.ylabel(r'$(W/m^2)$')
         plt.title('Solar irradiance profile')
         plt.savefig('Irradiancia' + '.png')
         plt.show()
@@ -383,41 +384,60 @@ if __name__ == '__main__':
         replay_buffer = ReplayBuffer(BUFFER_SIZE, RANDOM_SEED)
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
-        for i in range(epochs):
-            state = np.zeros(state_dim) #env.reset() #Este definirlo a manopla para la simulacion, porque el reset me cambia random las T y las Irr
-            env = gym.make(ENV_NAME)
+        init_state = np.zeros(state_dim)
+        irradiancias = list([1000.]) # list([1000., 500., 1000., 500., 900., 600., 800., 400., 100.]) #irradiancias = list([1000., 1000., 800., 700.]) #list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
+        temperaturas = list([25.])#list([25.0, 25.00, 27.5,  27.50, 29.0, 29., 23.0, 23.0, 23.]) #temperaturas = list([25.0, 27.5, 25., 22.3]) #list([13.5, 15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
+        Temp_0 = temperaturas[0]
+        Irr_0 = irradiancias[0]
+        env = gym.make(ENV_NAME)
+        state = env.setTempIrr(init_state,Temp_0,Irr_0)
+        grafos = graficos(state, Temp_0, Irr_0)
+        P_max = []
+        V_max = []
+        I_max = []
+        
+        for i in range(len(temperaturas)):
+            
+            #state = np.zeros(3) #env.reset() #Este definirlo a manopla para la simulacion, porque el reset me cambia random las T y las Irr
+            #env = gym.make(ENV_NAME)
+            #state = env.setTempIrr(state,temperaturas[i],irradiancias[i])
             print('state_0 = ', state, state.shape)
             done = False
             epsilon -= (epsilon/EXPLORE)
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
-            max_steps = 200
-            Temp_0 = 0.
-            Irr_0 = 0.
-            grafos = graficos(state, Temp_0, Irr_0)
+            max_steps = 50
+            Temp_i = temperaturas[i]
+            Irr_i = irradiancias[i]
+            env.setTempIrr(state,Temp_i,Irr_i)
+            #grafos = graficos(state, Temp_0, Irr_0)
+            P_episodio = []
+            V_episodio = []
+            I_episodio = []
+            
             while (step< max_steps):
                 step += 1
                 print('step =', step)
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
                 #print('la accion es:', action, type(action))
                 #action1 = action
-                #action = np.clip(action,min_action,max_action)
+                action = np.clip(action,min_action,max_action)
                 #action = action + max(epsilon,0)*ruido.noise()
                 #action = np.clip(action,min_action,max_action)
-                Temp = Temp_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Temp_0
-                Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
+                #Temp = Temp_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Temp_0
+                #Irr = Irr_0 #eventualmente se leen desde los sensores...la tomamos ctte e igual a Irr_0
                 next_state, reward, done, info = env.step(action)
                 #Para ir guardando datos para el ploteo final: 
                 informacion = info #me quedo con el dict de info
-                
-                #Depende como este configurado el estado, son los datos que guardamos de next_state:
-                
-                #      Cuadno considerando 3 componentes del estado (V,P,dV):
                 #grafos.add(next_state[0], next_state[1], next_state[2], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
-                
-                #      Cuadno considerando 2 componentes del estado (V,P):
                 grafos.add(next_state[0], next_state[1], informacion['Corriente'], informacion['Temperatura'], informacion['Irradiancia'], informacion['Accion'])
+                #grafos.add(next_state[0], next_state[1], next_state[2],info[0],info[1],info[2],info[3])
+
+                V_episodio.append(next_state[0])
+                P_episodio.append(next_state[1])
+                I_episodio.append(informacion['Corriente'])
+                
 
 
                 # reward = np.clip(reward,-1.,1.)
@@ -441,8 +461,19 @@ if __name__ == '__main__':
                     llegadas +=1
                 print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
                 print ('--------------------------------------------')
-                
-            grafos.plotear()
+
+            P_max.append(np.max(P_episodio))
+            P_max_index = np.argmax(P_episodio)
+            V_max.append(V_episodio[P_max_index])
+            I_max.append(I_episodio[P_max_index])
+            
+
+
+        grafos.plotear()
+
+        print('Pmax =', P_max)
+        print('Vmax =', V_max)
+        print('Imax =', I_max)
 
         print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
 

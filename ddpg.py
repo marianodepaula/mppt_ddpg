@@ -270,12 +270,12 @@ if __name__ == '__main__':
     TAU = 0.001
     DEVICE = '/cpu:0'
     # ENV_NAME = 'MountainCarContinuous-v0'
-    ENV_NAME = 'mppt-v0'#'Pendulum-v0'
+    ENV_NAME = 'mppt_shaded-v0'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 5.
     min_action = -5.
-    epochs = 2000
+    epochs = 1000
     epsilon = 1.0
     min_epsilon = 0.1
     EXPLORE = 200
@@ -286,7 +286,7 @@ if __name__ == '__main__':
         np.random.seed(RANDOM_SEED)
         tf.set_random_seed(RANDOM_SEED)
         env = gym.make(ENV_NAME)
-        state_dim = 3 #env.observation_space.shape[0]
+        state_dim = 2 #env.observation_space.shape[0]
         action_dim = 1 #env.action_space.shape[0]
         ddpg = DDPG(sess, state_dim, action_dim, max_action, min_action, ACTOR_LEARNING_RATE, CRITIC_LEARNING_RATE, TAU, RANDOM_SEED,device=DEVICE)
         sess.run(tf.global_variables_initializer())
@@ -294,6 +294,7 @@ if __name__ == '__main__':
         replay_buffer = ReplayBuffer(BUFFER_SIZE, RANDOM_SEED)
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
+        Reward_episodios = []
         for i in range(epochs):
             state = env.reset()
             #print('EL ESTADO RESETEADO ES', state, state.shape)
@@ -303,25 +304,29 @@ if __name__ == '__main__':
             episode_r = 0.
             step = 0
             max_steps = 110
+            r_episodio_actual = []
             while (not done):
                 step += 1
                 print('step =', step)
+                #wait = input("PRESS ENTER TO CONTINUE.")
                 action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
                 action1 = action
                 print('LA ACCION sin clipear ES', action1, action1.shape) 
                 action = np.clip(action1,min_action,max_action)
-                action = action + max(epsilon,0)*ruido.noise()
+                #action = action + max(epsilon,0)*ruido.noise()
                 action = np.clip(action,min_action,max_action)
                 print('LA ACCION clipeada ES', action, action.shape) 
                 
                 next_state, reward, done, info = env.step(action)
-                #print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
+                print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
                 #reward = np.clip(reward,-1.,1.)
                 print('instaneous r = ',reward)
                 replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
                                       done, np.reshape(next_state, (state_dim,)))
                 state = next_state
                 episode_r = episode_r + reward
+
+                r_episodio_actual.append(reward)
                 if replay_buffer.size() > MINIBATCH_SIZE:
                     s_batch, a_batch, r_batch, t_batch, s2_batch = replay_buffer.sample_batch(MINIBATCH_SIZE)
                     # train ddpg normally:
@@ -335,6 +340,11 @@ if __name__ == '__main__':
                 print ('--------------------------------------------')
                 print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
                 print ('--------------------------------------------')
+
+            Reward_episodios.append(r_episodio_actual)
+            np.save('Reward_episodios_DDPG01.npy',Reward_episodios)
+            
+
         print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
 
 
