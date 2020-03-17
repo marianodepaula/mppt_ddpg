@@ -345,9 +345,16 @@ class graficos(object):
 
 
 
+def normalizing_state(state):
+    #state = [V,P] being V_min = 0, V_max = 210, P_min = 0, P_max = 25000 we use ((xi-x_min)/(x_max-x_min))-1
+    V_min = 0
+    V_max = 210
+    P_min = 0
+    P_max = 25000
 
+    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1]
 
-
+    return st
 
 
 if __name__ == '__main__':
@@ -391,6 +398,7 @@ if __name__ == '__main__':
         Irr_0 = irradiancias[0]
         env = gym.make(ENV_NAME)
         state = env.setTempIrr(init_state,Temp_0,Irr_0)
+        normalized_state = normalizing_state(state)
         grafos = graficos(state, Temp_0, Irr_0)
         P_max = []
         V_max = []
@@ -419,7 +427,8 @@ if __name__ == '__main__':
             while (step< max_steps):
                 step += 1
                 print('step =', step)
-                action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
+
+                action = ddpg.predict_action(np.reshape(normalized_state,(1,state_dim)))
                 #print('la accion es:', action, type(action))
                 #action1 = action
                 action = np.clip(action,min_action,max_action)
@@ -446,6 +455,7 @@ if __name__ == '__main__':
                                       done, np.reshape(next_state, (state_dim,)))
                 '''
                 state = next_state
+                normalized_state = normalizing_state(state)
                 episode_r = episode_r + reward
                 '''
                 if replay_buffer.size() > MINIBATCH_SIZE:

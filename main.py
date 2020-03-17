@@ -259,6 +259,17 @@ class DDPG(object):
 
 
 
+def normalizing_state(state):
+    #state = [V,P] being V_min = 0, V_max = 210, P_min = 0, P_max = 25000 we use ((xi-x_min)/(x_max-x_min))-1
+    V_min = 0
+    V_max = 210
+    P_min = 0
+    P_max = 25000
+
+    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1]
+
+    return st
+
 
 if __name__ == '__main__':
     from replay_buffer import ReplayBuffer
@@ -297,6 +308,7 @@ if __name__ == '__main__':
         Reward_episodios = []
         for i in range(epochs):
             state = env.reset()
+            normalized_state = normalizing_state(state)
             #print('EL ESTADO RESETEADO ES', state, state.shape)
             done = False
             epsilon -= (epsilon/EXPLORE)
@@ -308,24 +320,29 @@ if __name__ == '__main__':
             while (not done):
                 step += 1
                 print('step =', step)
-                wait = input("PRESS ENTER TO CONTINUE.")
-                action = ddpg.predict_action(np.reshape(state,(1,state_dim)))
+                #wait = input("PRESS ENTER TO CONTINUE.")
+                action = ddpg.predict_action(np.reshape(normalized_state,(1,state_dim)))
                 action1 = action
                 print('LA ACCION sin clipear ES', action1, action1.shape) 
                 action = np.clip(action1,min_action,max_action)
-                action = action + max(epsilon,0)*ruido.noise()*2.
+                action = action + max(epsilon,0)*ruido.noise()
                 action = np.clip(action,min_action,max_action)
-                print('ruido =', max(epsilon,0)*ruido.noise()*2.,'epsilon =',epsilon)
+                print('ruido =', max(epsilon,0)*ruido.noise(),'epsilon =',epsilon)
                 print('LA ACCION clipeada ES', action, action.shape)
                 
                 next_state, reward, done, info = env.step(action)
+                normalized_next_state = normalizing_state(next_state)
                 print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
                 #reward = np.clip(reward,-1.,1.)
                 print('instaneous r = ',reward)
-                replay_buffer.add(np.reshape(state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
-                                      done, np.reshape(next_state, (state_dim,)))
+                
+                #print('normalized_state =',normalized_state)
+                #wait = input("PRESS ENTER TO CONTINUE.")
+                replay_buffer.add(np.reshape(normalized_state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
+                                      done, np.reshape(normalized_next_state, (state_dim,)))
                 state = next_state
                 episode_r = episode_r + reward
+                normalized_state = normalizing_state(state)
 
                 r_episodio_actual.append(reward)
                 if replay_buffer.size() > MINIBATCH_SIZE:
