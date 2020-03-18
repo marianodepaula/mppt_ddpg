@@ -284,9 +284,9 @@ if __name__ == '__main__':
     ENV_NAME = 'mppt_shaded-v0'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
-    max_action = 5.
-    min_action = -5.
-    epochs = 2000
+    max_action = 10.
+    min_action = -10.
+    epochs = 1000
     epsilon = 1.0
     min_epsilon = 0.1
     EXPLORE = 2000
