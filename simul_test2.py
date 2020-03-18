@@ -101,7 +101,8 @@ class DDPG(object):
                 l1 = tf.contrib.layers.fully_connected(self.inputs, LAYER_1,  activation_fn=tf.nn.leaky_relu) # tf.nn.leaky_relu tf.nn.relu
                 l2 = tf.contrib.layers.fully_connected(l1, LAYER_2,  activation_fn=tf.nn.leaky_relu)
                 w_init = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
-                a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=None) # None  tf.nn.tanh
+                a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=tf.nn.tanh) # (para el ddpg)
+                #a = tf.contrib.layers.fully_connected(l2, self.a_dim, weights_initializer=w_init, activation_fn=None) # (para el inverted)
                 scaled_a = a
                 # scaled_a = tf.clip_by_value(a,self.min_action,self.max_action)#tf.multiply(a, self.action_bound)
                        
@@ -342,7 +343,25 @@ class graficos(object):
         plt.show()
 
 
+        t = np.linspace(0,len(self.Temp),len(self.Temp))
+        fig, ax1 = plt.subplots()
 
+        color = 'tab:red'
+        ax1.set_xlabel('Time (sec)')
+        ax1.set_ylabel('Temp (ºC)', color=color)
+        ax1.plot(t, self.Temp, color=color)
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+        color = 'tab:blue'
+        ax2.set_ylabel('Irradince '+ r'$(W/m^2)$', color=color)  # we already handled the x-label with ax1
+        ax2.plot(t, self.Irr, color=color)
+        ax2.tick_params(axis='y', labelcolor=color)
+
+        fig.tight_layout()  # otherwise the right y-label is slightly clipped
+        plt.savefig('Temperatura_Irradiancia' + '.png')
+        plt.show()
 
 
 def normalizing_state(state):
@@ -367,7 +386,7 @@ if __name__ == '__main__':
     TAU = 0.001
     DEVICE = '/cpu:0'
     # ENV_NAME = 'MountainCarContinuous-v0'
-    ENV_NAME = 'mppt_shaded-v0'#'Pendulum-v0'
+    ENV_NAME = 'mppt_shaded-v1'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 5.
@@ -392,12 +411,14 @@ if __name__ == '__main__':
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
         init_state = np.zeros(state_dim)
-        irradiancias = list([1000.]) # list([1000., 500., 1000., 500., 900., 600., 800., 400., 100.]) #irradiancias = list([1000., 1000., 800., 700.]) #list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
-        temperaturas = list([25.])#list([25.0, 25.00, 27.5,  27.50, 29.0, 29., 23.0, 23.0, 23.]) #temperaturas = list([25.0, 27.5, 25., 22.3]) #list([13.5, 15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
+        irradiancias = list([1000.]) #list([1000., 500., 1000., 500., 900., 600., 800., 400., 100.]) #irradiancias = list([1000., 1000., 800., 700.]) #list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
+        temperaturas = list([25.]) #list([25.0, 25.00, 27.5,  27.50, 29.0, 29., 23.0, 23.0, 23.]) #temperaturas = list([25.0, 27.5, 25., 22.3]) #list([13.5, 15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
+        sh = list([[4, 10, 7, 10, 10, 10]])# list([[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10]]) #tengo que completar esa lista con tantas tuplas como temperatras e irr haya....si tengo 5 temperaturas, por tanto tengo que poner 5 tuplas, variandolas o no...como quiera...
         Temp_0 = temperaturas[0]
         Irr_0 = irradiancias[0]
+        SH_0 = sh[0]
         env = gym.make(ENV_NAME)
-        state = env.setTempIrr(init_state,Temp_0,Irr_0)
+        state = env.setTempIrr(init_state,Temp_0,Irr_0,SH_0)
         normalized_state = normalizing_state(state)
         grafos = graficos(state, Temp_0, Irr_0)
         P_max = []
@@ -415,10 +436,11 @@ if __name__ == '__main__':
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
             step = 0
-            max_steps = 50
+            max_steps = 1000
             Temp_i = temperaturas[i]
             Irr_i = irradiancias[i]
-            env.setTempIrr(state,Temp_i,Irr_i)
+            SH_i=sh[i]
+            env.setTempIrr(state,Temp_i,Irr_i,SH_i)
             #grafos = graficos(state, Temp_0, Irr_0)
             P_episodio = []
             V_episodio = []
@@ -481,9 +503,17 @@ if __name__ == '__main__':
 
         grafos.plotear()
 
+        np.save('Potencia_DDPG',grafos.P)
+        np.save('Tension_DDPG',grafos.V)
+        np.save('Corriente_DDPG',grafos.I)
+        np.save('Acciones_DDPG',grafos.acciones)
+
+
         print('Pmax =', P_max)
         print('Vmax =', V_max)
         print('Imax =', I_max)
+
+
 
         print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
 
