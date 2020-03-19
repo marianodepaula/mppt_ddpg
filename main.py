@@ -264,7 +264,7 @@ def normalizing_state(state):
     V_min = 0
     V_max = 210
     P_min = 0
-    P_max = 25000
+    P_max = 26000
 
     st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1]
 
@@ -310,6 +310,7 @@ if __name__ == '__main__':
             state = env.reset()
             normalized_state = normalizing_state(state)
             #print('EL ESTADO RESETEADO ES', state, state.shape)
+            print('epoch = ', i)
             done = False
             epsilon -= (epsilon/EXPLORE)
             epsilon = np.maximum(min_epsilon,epsilon)
@@ -319,22 +320,22 @@ if __name__ == '__main__':
             r_episodio_actual = []
             while (not done):
                 step += 1
-                print('step =', step)
+                #print('step =', step)
                 #wait = input("PRESS ENTER TO CONTINUE.")
                 action = ddpg.predict_action(np.reshape(normalized_state,(1,state_dim)))
                 action1 = action
-                print('LA ACCION sin clipear ES', action1, action1.shape) 
+                #print('LA ACCION sin clipear ES', action1, action1.shape) 
                 action = np.clip(action1,min_action,max_action)
                 action = action + max(epsilon,0)*ruido.noise()
                 action = np.clip(action,min_action,max_action)
-                print('ruido =', max(epsilon,0)*ruido.noise(),'epsilon =',epsilon)
-                print('LA ACCION clipeada ES', action, action.shape)
+                #print('ruido =', max(epsilon,0)*ruido.noise(),'epsilon =',epsilon)
+                #print('LA ACCION clipeada ES', action, action.shape)
                 
                 next_state, reward, done, info = env.step(action)
                 normalized_next_state = normalizing_state(next_state)
-                print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
+                #print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
                 #reward = np.clip(reward,-1.,1.)
-                print('instaneous r = ',reward)
+                #print('instaneous r = ',reward)
                 
                 #print('normalized_state =',normalized_state)
                 #wait = input("PRESS ENTER TO CONTINUE.")
@@ -355,9 +356,9 @@ if __name__ == '__main__':
                 #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state,'last r =', round(reward[0][0],3), 'episode reward =',round(episode_r[0][0],3), 'epsilon =', round(epsilon,3))
                 if done:
                     llegadas +=1
-                print ('--------------------------------------------')
-                print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
-                print ('--------------------------------------------')
+                #print ('--------------------------------------------')
+                #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
+                #print ('--------------------------------------------')
 
             Reward_episodios.append(r_episodio_actual)
             np.save('Reward_episodios_DDPG01.npy',Reward_episodios)
