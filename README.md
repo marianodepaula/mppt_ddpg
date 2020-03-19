@@ -1,8 +1,8 @@
 # mppt_ddpg
-
+An implementation of DDPG for maximum power point traking of a photovoltaic system.
 ## Requirements: 
 
-- tensorflow 1
+- Tensorflow 1
 - numpy
 - python 3.5
 - Gym Open AI
@@ -24,14 +24,16 @@ It is recommendable installing in a python virtual environment (https://rukbotto
 In a console run:
 
 ``` 
-python ddpg.py
+python main.py
 
 ```
 
 ### Testing:
 
 ``` 
-python simul_test_ddpg2.py
+python simul_test2.py
+
+```
 
 
 
