@@ -321,10 +321,11 @@ class graficos(object):
         plt.savefig('Potencia' + '.png')
         plt.show()
 
-        plt.plot(self.acciones)
+        plt.plot(self.acciones,'.')
         plt.xlabel('Time (sec)')
         plt.ylabel('')
         plt.title('Manipulated actions')
+        plt.ylim(-10,10)
         plt.savefig('Acciones' + '.png')
         plt.show()
 
@@ -369,10 +370,11 @@ def normalizing_state(state):
     V_min = 0
     V_max = 210
     P_min = 0
-    P_max = 25000
+    P_max = 54000
+    DeltaP_min = -15000
+    DeltaP_max = 15000
 
-    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1,state[2]]
-
+    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1,(2*(state[1]-DeltaP_min)/(DeltaP_max-DeltaP_min))-1]
     return st
 
 
@@ -411,9 +413,18 @@ if __name__ == '__main__':
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
         init_state = np.zeros(state_dim)
-        irradiancias = list([1000.,1000.,1000.]) #list([1000., 1000., 1000.]) #list([1000., 500., 1000., 500., 900., 600., 800., 400., 100.]) #irradiancias = list([1000., 1000., 800., 700.]) #list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
-        temperaturas = list([25.,25.,25.]) #list([25., 25., 25.]) #list([25.0, 25.00, 27.5,  27.50, 29.0, 29., 23.0, 23.0, 23.]) #temperaturas = list([25.0, 27.5, 25., 22.3]) #list([13.5, 15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
-        sh = list([[4, 10, 7, 10, 10, 10],[2, 10, 10, 10, 7, 10],[8, 10, 6, 10, 5, 10]])#list([[4, 10, 7, 10, 10, 10]])#list([[4, 10, 7, 10, 10, 10],[2, 10, 10, 10, 7, 10],[8, 10, 6, 10, 5, 10]])# list([[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10]]) #tengo que completar esa lista con tantas tuplas como temperatras e irr haya....si tengo 5 temperaturas, por tanto tengo que poner 5 tuplas, variandolas o no...como quiera...
+        irradiancias = list([1000.]) #list([1000., 1000., 1000.]) #list([1000., 500., 1000., 500., 900., 600., 800., 400., 100.]) #irradiancias = list([1000., 1000., 800., 700.]) #list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
+        temperaturas = list([25.]) #list([25., 25., 25.]) #list([25.0, 25.00, 27.5,  27.50, 29.0, 29., 23.0, 23.0, 23.]) #temperaturas = list([25.0, 27.5, 25., 22.3]) #list([13.5, 15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
+        sh = list([[4, 10, 7, 10, 10, 10]]) #list([[10, 10, 10, 10, 10, 10],[10, 10, 10, 10, 10, 10],[10, 10, 10, 10, 10, 10]])
+        sh = list([[2, 10, 10, 10, 7, 10]])
+        sh = list([[8, 10, 6, 10, 5, 10]])
+        sh = list([[10, 10, 10, 10, 10, 10]])
+        sh = list([[1, 10, 3, 10, 5, 10]])
+        sh = list([[5, 10, 10, 10, 4, 10]])
+        sh = list([[10, 10, 7, 10, 2, 10]])
+        sh = list([[10, 10, 1, 10, 2, 10]])
+        sh = list([[3, 10, 8, 10, 5, 10]])
+        sh = list([[9, 10, 3, 10, 6, 10]])
         Temp_0 = temperaturas[0]
         Irr_0 = irradiancias[0]
         SH_0 = sh[0]
@@ -501,7 +512,7 @@ if __name__ == '__main__':
             
 
 
-        grafos.plotear()
+        #grafos.plotear()
 
         np.save('Potencia_DDPG',grafos.P)
         np.save('Tension_DDPG',grafos.V)
@@ -510,12 +521,14 @@ if __name__ == '__main__':
 
 
         print('Pmax =', P_max)
-        print('Vmax =', V_max)
-        print('Imax =', I_max)
+        #print('Vmax =', V_max)
+        #print('Imax =', I_max)
+        print('Pfinal =', (P_episodio[-2]+P_episodio[-1])/2)
+        print('deltaPoptima =', 100-((P_episodio[-2]+P_episodio[-1])/2)/P_max*100,'%')
 
 
 
-        print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
+        #print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
 
 
         #ddpg.save()

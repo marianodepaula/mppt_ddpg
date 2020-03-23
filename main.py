@@ -264,9 +264,11 @@ def normalizing_state(state):
     V_min = 0
     V_max = 210
     P_min = 0
-    P_max = 40000
+    P_max = 54000
+    DeltaP_min = -15000
+    DeltaP_max = 15000
 
-    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1,state[2]]
+    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1,(2*(state[1]-DeltaP_min)/(DeltaP_max-DeltaP_min))-1]
 
     return st
 
@@ -286,10 +288,10 @@ if __name__ == '__main__':
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 10.
     min_action = -10.
-    epochs = 30000
+    epochs = 15000
     epsilon = 1.0
     min_epsilon = 0.1
-    EXPLORE = 29000
+    EXPLORE = 15000
     BUFFER_SIZE = 50000
     RANDOM_SEED = 51234
     MINIBATCH_SIZE = 64# 32 # 5
