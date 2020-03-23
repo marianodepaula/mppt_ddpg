@@ -371,7 +371,7 @@ def normalizing_state(state):
     P_min = 0
     P_max = 25000
 
-    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1]
+    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1,state[2]]
 
     return st
 
@@ -386,7 +386,7 @@ if __name__ == '__main__':
     TAU = 0.001
     DEVICE = '/cpu:0'
     # ENV_NAME = 'MountainCarContinuous-v0'
-    ENV_NAME = 'mppt_shaded-v1'#'Pendulum-v0'
+    ENV_NAME = 'mppt_shaded-v0'#'Pendulum-v0'
     # import gym_foo
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 5.
@@ -401,8 +401,8 @@ if __name__ == '__main__':
     with tf.Session() as sess:
         np.random.seed(RANDOM_SEED)
         tf.set_random_seed(RANDOM_SEED)
-        #env = gym.make(ENV_NAME)
-        state_dim = 2 #env.observation_space.shape[0]
+        env = gym.make(ENV_NAME)
+        state_dim = np.size(env.reset())#2 #env.observation_space.shape[0]
         action_dim = 1 #env.action_space.shape[0]
         ddpg = DDPG(sess, state_dim, action_dim, max_action, min_action, ACTOR_LEARNING_RATE, CRITIC_LEARNING_RATE, TAU, RANDOM_SEED,device=DEVICE)
         sess.run(tf.global_variables_initializer())
@@ -411,13 +411,13 @@ if __name__ == '__main__':
         ruido = OUNoise(action_dim, mu = 0.0)
         llegadas =0
         init_state = np.zeros(state_dim)
-        irradiancias = list([1000.]) #list([1000., 500., 1000., 500., 900., 600., 800., 400., 100.]) #irradiancias = list([1000., 1000., 800., 700.]) #list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
-        temperaturas = list([25.]) #list([25.0, 25.00, 27.5,  27.50, 29.0, 29., 23.0, 23.0, 23.]) #temperaturas = list([25.0, 27.5, 25., 22.3]) #list([13.5, 15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
-        sh = list([[4, 10, 7, 10, 10, 10]])# list([[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10]]) #tengo que completar esa lista con tantas tuplas como temperatras e irr haya....si tengo 5 temperaturas, por tanto tengo que poner 5 tuplas, variandolas o no...como quiera...
+        irradiancias = list([1000.,1000.,1000.]) #list([1000., 1000., 1000.]) #list([1000., 500., 1000., 500., 900., 600., 800., 400., 100.]) #irradiancias = list([1000., 1000., 800., 700.]) #list([100., 200., 300., 400., 500., 600., 700., 800., 900., 1000])
+        temperaturas = list([25.,25.,25.]) #list([25., 25., 25.]) #list([25.0, 25.00, 27.5,  27.50, 29.0, 29., 23.0, 23.0, 23.]) #temperaturas = list([25.0, 27.5, 25., 22.3]) #list([13.5, 15., 17.5, 20., 22.5, 25., 27.5, 30., 32.5, 35])
+        sh = list([[4, 10, 7, 10, 10, 10],[2, 10, 10, 10, 7, 10],[8, 10, 6, 10, 5, 10]])#list([[4, 10, 7, 10, 10, 10]])#list([[4, 10, 7, 10, 10, 10],[2, 10, 10, 10, 7, 10],[8, 10, 6, 10, 5, 10]])# list([[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10],[4, 10, 7, 10, 10, 10]]) #tengo que completar esa lista con tantas tuplas como temperatras e irr haya....si tengo 5 temperaturas, por tanto tengo que poner 5 tuplas, variandolas o no...como quiera...
         Temp_0 = temperaturas[0]
         Irr_0 = irradiancias[0]
         SH_0 = sh[0]
-        env = gym.make(ENV_NAME)
+        #env = gym.make(ENV_NAME)
         state = env.setTempIrr(init_state,Temp_0,Irr_0,SH_0)
         normalized_state = normalizing_state(state)
         grafos = graficos(state, Temp_0, Irr_0)

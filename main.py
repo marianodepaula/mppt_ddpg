@@ -264,9 +264,9 @@ def normalizing_state(state):
     V_min = 0
     V_max = 210
     P_min = 0
-    P_max = 26000
+    P_max = 40000
 
-    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1]
+    st = [(2*(state[0]-V_min)/(V_max-V_min))-1, (2*(state[1]-P_min)/(P_max-P_min))-1,state[2]]
 
     return st
 
@@ -286,10 +286,10 @@ if __name__ == '__main__':
     # ENV_NAME = 'nessie_end_to_end-v0'
     max_action = 10.
     min_action = -10.
-    epochs = 1000
+    epochs = 30000
     epsilon = 1.0
     min_epsilon = 0.1
-    EXPLORE = 2000
+    EXPLORE = 29000
     BUFFER_SIZE = 50000
     RANDOM_SEED = 51234
     MINIBATCH_SIZE = 64# 32 # 5
@@ -304,29 +304,34 @@ if __name__ == '__main__':
         #ddpg.load()
         replay_buffer = ReplayBuffer(BUFFER_SIZE, RANDOM_SEED)
         ruido = OUNoise(action_dim, mu = 0.0)
-        llegadas =0
         Reward_episodios = []
+        llegadas =0
         for i in range(epochs):
             state = env.reset()
             normalized_state = normalizing_state(state)
             #print('EL ESTADO RESETEADO ES', state, state.shape)
-            print('epoch = ', i)
+            #print('epoch = ', i)
             done = False
             epsilon -= (epsilon/EXPLORE)
             epsilon = np.maximum(min_epsilon,epsilon)
             episode_r = 0.
-            step = 0
-            max_steps = 110
+            step = 0 
+            max_steps = 45 #es solo a efecto de contador
             r_episodio_actual = []
+            #llegadas =0
             while (not done):
-                step += 1
                 #print('step =', step)
                 #wait = input("PRESS ENTER TO CONTINUE.")
                 action = ddpg.predict_action(np.reshape(normalized_state,(1,state_dim)))
                 action1 = action
                 #print('LA ACCION sin clipear ES', action1, action1.shape) 
                 action = np.clip(action1,min_action,max_action)
-                action = action + max(epsilon,0)*ruido.noise()
+                #action = action + max(epsilon,0)*ruido.noise()
+                #e-greedy action selection
+                if random.random() < epsilon:
+                    action = random.uniform(min_action,max_action)
+                    #print('Explorando')
+
                 action = np.clip(action,min_action,max_action)
                 #print('ruido =', max(epsilon,0)*ruido.noise(),'epsilon =',epsilon)
                 #print('LA ACCION clipeada ES', action, action.shape)
@@ -336,7 +341,7 @@ if __name__ == '__main__':
                 #print('EL NEXT_ESTADO ES', next_state, next_state.shape) 
                 #reward = np.clip(reward,-1.,1.)
                 #print('instaneous r = ',reward)
-                
+                #print('Steps = ', info['Steps'],'V0 =',info['v0'])
                 #print('normalized_state =',normalized_state)
                 #wait = input("PRESS ENTER TO CONTINUE.")
                 replay_buffer.add(np.reshape(normalized_state, (state_dim,)), np.reshape(action, (action_dim,)), reward,
@@ -354,17 +359,21 @@ if __name__ == '__main__':
                     #ddpg.test_gradient(s_batch, a_batch, r_batch, t_batch, s2_batch,MINIBATCH_SIZE)
                 #print(i, step, 'last r', round(reward,3), 'episode reward',round(episode_r,3), 'epsilon', round(epsilon,3))
                 #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state,'last r =', round(reward[0][0],3), 'episode reward =',round(episode_r[0][0],3), 'epsilon =', round(epsilon,3))
-                if done:
-                    llegadas +=1
-                #print ('--------------------------------------------')
-                #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
-                #print ('--------------------------------------------')
+                step += 1
+
+            #if info['Steps'] > max_steps:
+             #   llegadas +=1
+            #print ('--------------------------------------------')
+            #print('epoch =',i,'step =' ,step, 'done =', done,'St(V,P,I) =',state, 'accion =',action,'last r =', reward, 'episode reward =',episode_r, 'epsilon =', round(epsilon,3))
+            #print ('--------------------------------------------')
+
+                
 
             Reward_episodios.append(r_episodio_actual)
             np.save('Reward_episodios_DDPG01.npy',Reward_episodios)
             
 
-        print('FINNNNNN!!! =) y llego ',llegadas, 'veces!!')                
+            print('FIN epoch = ',i)                
 
 
         ddpg.save()
